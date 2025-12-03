@@ -1,0 +1,140 @@
+import type { Activity, UserProfile } from './types';
+
+// This is a simplified UserProfile for dummy data, as we don't have a full Firebase User object
+export const DUMMY_USERS: Omit<UserProfile, keyof import('firebase/auth').User | 'providerId' >[] = [
+  {
+    uid: 'admin01',
+    email: 'admin@campus.com',
+    displayName: 'Admin User',
+    photoURL: 'https://i.pravatar.cc/150?u=admin01',
+    role: 'admin',
+  },
+  {
+    uid: 'staff01',
+    email: 'hod@campus.com',
+    displayName: 'Dr. Evelyn Reed',
+    photoURL: 'https://i.pravatar.cc/150?u=staff01',
+    role: 'staff',
+    department: 'Computer Science',
+  },
+  {
+    uid: 'student01',
+    email: 'student1@campus.com',
+    displayName: 'Alex Johnson',
+    photoURL: 'https://i.pravatar.cc/150?u=student01',
+    role: 'student',
+    department: 'Computer Science',
+  },
+    {
+    uid: 'student02',
+    email: 'student2@campus.com',
+    displayName: 'Maria Garcia',
+    photoURL: 'https://i.pravatar.cc/150?u=student02',
+    role: 'student',
+    department: 'Computer Science',
+  },
+  {
+    uid: 'student03',
+    email: 'student3@campus.com',
+    displayName: 'Chen Wei',
+    photoURL: 'https://i.pravatar.cc/150?u=student03',
+    role: 'student',
+    department: 'Mechanical Engineering',
+  },
+];
+
+
+export const DUMMY_ACTIVITIES: Activity[] = [
+  {
+    id: 'act001',
+    studentId: 'student01',
+    studentName: 'Alex Johnson',
+    description: 'Organized a campus-wide e-waste collection drive to promote responsible consumption and production.',
+    sdgGoals: [12, 13],
+    documentationLinks: [
+      'https://www.un.org/sustainabledevelopment/sustainable-consumption-production/',
+      'https://www.un.org/sustainabledevelopment/climate-change/',
+    ],
+    status: 'approved',
+    submittedAt: new Date('2023-10-15T10:00:00Z'),
+    points: 20,
+    verifiedBy: 'staff01',
+    verifiedAt: new Date('2023-10-16T14:30:00Z'),
+    feedback: 'Great initiative! Well-documented and impactful.',
+  },
+  {
+    id: 'act002',
+    studentId: 'student02',
+    studentName: 'Maria Garcia',
+    description:
+      'Developed a low-cost water purification filter using locally sourced materials for communities with limited access to clean water.',
+    sdgGoals: [6],
+    documentationLinks: ['https://www.who.int/news-room/fact-sheets/detail/drinking-water'],
+    status: 'approved',
+    submittedAt: new Date('2023-10-20T09:00:00Z'),
+    points: 30,
+    verifiedBy: 'staff01',
+    verifiedAt: new Date('2023-10-21T11:00:00Z'),
+    feedback: 'Excellent project with clear benefits. Approved.',
+  },
+  {
+    id: 'act003',
+    studentId: 'student01',
+    studentName: 'Alex Johnson',
+    description: 'Volunteered at a local food bank to help sort and distribute meals to those in need, addressing zero hunger.',
+    sdgGoals: [2],
+    documentationLinks: ['https://www.wfp.org/zero-hunger'],
+    status: 'pending',
+    submittedAt: new Date('2023-11-01T16:00:00Z'),
+    points: 0,
+  },
+  {
+    id: 'act004',
+    studentId: 'student03',
+    studentName: 'Chen Wei',
+    description: 'Designed and built a small-scale solar panel system for charging mobile devices, promoting affordable and clean energy.',
+    sdgGoals: [7, 11],
+    documentationLinks: [
+      'https://github.com/example/solar-charger',
+      'https://example.com/blog/my-solar-project',
+    ],
+    status: 'pending',
+    submittedAt: new Date('2023-11-02T11:20:00Z'),
+    points: 0,
+  },
+  {
+    id: 'act005',
+    studentId: 'student02',
+    studentName: 'Maria Garcia',
+    description: 'Conducted a campus workshop on gender equality and women\'s empowerment, featuring guest speakers.',
+    sdgGoals: [5],
+    documentationLinks: ['https://www.unwomen.org/en/news/in-focus/international-womens-day'],
+    status: 'rejected',
+    submittedAt: new Date('2023-09-10T14:00:00Z'),
+    points: 0,
+    verifiedBy: 'staff01',
+    verifiedAt: new Date('2023-09-11T10:00:00Z'),
+    feedback:
+      'The documentation link is a general article. Please provide specific evidence of the workshop, such as photos, presentation materials, or a sign-in sheet.',
+  },
+];
+
+export const SDG_GOALS = [
+    { id: 1, name: "No Poverty", color: "#E5243B" },
+    { id: 2, name: "Zero Hunger", color: "#DDA63A" },
+    { id: 3, name: "Good Health and Well-being", color: "#4C9F38" },
+    { id: 4, name: "Quality Education", color: "#C5192D" },
+    { id: 5, name: "Gender Equality", color: "#FF3A21" },
+    { id: 6, name: "Clean Water and Sanitation", color: "#26BDE2" },
+    { id: 7, name: "Affordable and Clean Energy", color: "#FCC30B" },
+    { id: 8, name: "Decent Work and Economic Growth", color: "#A21942" },
+    { id: 9, name: "Industry, Innovation, and Infrastructure", color: "#FD6925" },
+    { id: 10, name: "Reduced Inequality", color: "#DD1367" },
+    { id: 11, name: "Sustainable Cities and Communities", color: "#FD9D24" },
+    { id: 12, name: "Responsible Consumption and Production", color: "#BF8B2E" },
+    { id: 13, name: "Climate Action", color: "#3F7E44" },
+    { id: 14, name: "Life Below Water", color: "#0A97D9" },
+    { id: 15, name: "Life on Land", color: "#56C02B" },
+    { id: 16, name: "Peace and Justice Strong Institutions", color: "#00689D" },
+    { id: 17, name: "Partnerships for the Goals", color: "#19486A" }
+];
