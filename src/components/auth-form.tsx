@@ -110,8 +110,7 @@ export function AuthForm() {
             <RadioGroup name="role" defaultValue="student" className="flex gap-4">
               {DUMMY_USERS.map((user) => (
                  <div key={user.uid} className="flex items-center space-x-2">
-                  <RadioGroupItem value={user.role} id={`role-${user.role}`} />
-                  <Label htmlFor={`role-${user.role}`} className="capitalize">{user.role}</Label>
+                  <RadioGroupItem value={user.role} id={`role-${user.role}`} aria-label={user.role} />
                 </div>
               ))}
             </RadioGroup>
