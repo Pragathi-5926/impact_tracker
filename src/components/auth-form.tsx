@@ -61,9 +61,9 @@ export function AuthForm() {
           <Input id="password" type="password" required />
         </div>
         {!isSignUp && (
-          <div className="grid gap-2 text-center">
+          <div className="grid gap-2 text-center my-4">
             <Label>Select your role to login</Label>
-            <RadioGroup name="role" defaultValue="student" className="flex gap-4 justify-center">
+            <RadioGroup name="role" defaultValue="student" className="flex gap-4 justify-center pt-2">
               {uniqueRoles.map((role) => (
                  <div key={role} className="flex items-center space-x-2">
                   <RadioGroupItem value={role} id={`role-${role}`} />
