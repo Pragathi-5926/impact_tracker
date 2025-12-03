@@ -79,6 +79,9 @@ export function AuthForm() {
     router.push('/dashboard');
   };
 
+  const uniqueRoles: UserRole[] = Array.from(new Set(DUMMY_USERS.map(u => u.role)));
+
+
   return (
     <>
       <form onSubmit={handleSignIn} className="grid gap-4">
@@ -108,9 +111,12 @@ export function AuthForm() {
           <div className="grid gap-2">
             <Label>Select your role to login</Label>
             <RadioGroup name="role" defaultValue="student" className="flex gap-4">
-              {DUMMY_USERS.map((user) => (
-                 <div key={user.uid} className="flex items-center space-x-2">
-                  <RadioGroupItem value={user.role} id={`role-${user.role}`} aria-label={user.role} />
+              {uniqueRoles.map((role) => (
+                 <div key={role} className="flex items-center space-x-2">
+                  <RadioGroupItem value={role} id={`role-${role}`} aria-label={role} />
+                   <Label className="capitalize" htmlFor={`role-${role}`}>
+                    {role}
+                  </Label>
                 </div>
               ))}
             </RadioGroup>
