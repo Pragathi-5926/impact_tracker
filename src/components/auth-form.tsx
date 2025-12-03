@@ -109,11 +109,11 @@ export function AuthForm() {
         </div>
         {!isSignUp && (
           <div className="grid gap-2">
-            <Label>Select your role to login</Label>
-            <RadioGroup name="role" defaultValue="student" className="flex gap-4">
+            <Label className='text-center'>Select your role to login</Label>
+            <RadioGroup name="role" defaultValue="student" className="flex gap-4 justify-center">
               {uniqueRoles.map((role) => (
                  <div key={role} className="flex items-center space-x-2">
-                  <RadioGroupItem value={role} id={`role-${role}`} aria-label={role} />
+                  <RadioGroupItem value={role} id={`role-${role}`} />
                    <Label className="capitalize" htmlFor={`role-${role}`}>
                     {role}
                   </Label>
