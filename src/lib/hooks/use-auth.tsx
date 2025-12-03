@@ -10,14 +10,14 @@ import {
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase/config';
-import type { UserProfile } from '@/lib/types';
+import type { UserProfile, UserRole } from '@/lib/types';
 import { DUMMY_USERS } from '@/lib/data';
 
 interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
   // This function allows switching users in demo mode
-  loginAs: (role: 'admin' | 'staff' | 'student' | null) => void;
+  loginAs: (role: UserRole | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,74 +25,74 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // This is for the demo mode to allow switching between users.
-  // In a real app, you would remove `loginAs` and the corresponding logic.
-  const [demoRole, setDemoRole] = useState<'admin' | 'staff' | 'student' | null>(null);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // This ensures that any logic depending on localStorage only runs on the client.
+    // This effect runs only once on the client after initial mount.
     setIsClient(true);
-    setDemoRole((localStorage.getItem('demoRole') as 'admin' | 'staff' | 'student' | null));
-  }, []);
+    
+    // Read the initial role from localStorage
+    const savedRole = localStorage.getItem('demoRole') as UserRole | null;
 
-
-  const loginAs = (role: 'admin' | 'staff' | 'student' | null) => {
-    setDemoRole(role);
-    if (typeof window !== 'undefined') {
-      if(role) {
-        localStorage.setItem('demoRole', role);
-      } else {
-        localStorage.removeItem('demoRole');
-      }
-    }
-  };
-
-
-  useEffect(() => {
-    // Don't run auth logic on the server or until the client has mounted
-    if (!isClient) {
-      return;
-    }
-
+    // Set up the authentication state listener
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
       // START MOCK LOGIC - Remove for production
       if (process.env.NEXT_PUBLIC_MOCK_AUTH === 'true' || !firebaseUser) {
-        const mockUser = DUMMY_USERS.find((u) => u.role === (demoRole || 'student')) as UserProfile | undefined;
+        // Use the role from localStorage for the initial client render
+        const currentRole = localStorage.getItem('demoRole') as UserRole | null;
+        const mockUser = DUMMY_USERS.find((u) => u.role === currentRole) as UserProfile | undefined;
         setUser(mockUser || null);
-        setLoading(false);
+        
         if (typeof document !== 'undefined') {
-          if (mockUser && demoRole) {
+          if (mockUser && currentRole) {
             document.cookie = `firebase-auth-token=mock-token; path=/; max-age=3600`;
           } else {
             document.cookie = 'firebase-auth-token=; path=/; max-age=-1;';
           }
         }
-        return;
-      }
-      // END MOCK LOGIC
-
-      if (firebaseUser) {
-        const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          setUser({ ...firebaseUser, ...userDoc.data() } as UserProfile);
-        } else {
-          // Handle case where user exists in Auth but not Firestore
-          setUser(null);
-        }
-        const token = await firebaseUser.getIdToken();
-        document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600`;
       } else {
-        setUser(null);
-        document.cookie = 'firebase-auth-token=; path=/; max-age=-1;';
+      // END MOCK LOGIC
+        if (firebaseUser) {
+          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            setUser({ ...firebaseUser, ...userDoc.data() } as UserProfile);
+          } else {
+            setUser(null);
+          }
+          const token = await firebaseUser.getIdToken();
+          document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600`;
+        } else {
+          setUser(null);
+          document.cookie = 'firebase-auth-token=; path=/; max-age=-1;';
+        }
       }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [demoRole, isClient]);
+  }, []);
+
+  const loginAs = (role: UserRole | null) => {
+    if (typeof window !== 'undefined') {
+      if (role) {
+        localStorage.setItem('demoRole', role);
+        const mockUser = DUMMY_USERS.find((u) => u.role === role) as UserProfile | undefined;
+        setUser(mockUser || null);
+        document.cookie = `firebase-auth-token=mock-token; path=/; max-age=3600`;
+      } else {
+        localStorage.removeItem('demoRole');
+        setUser(null);
+        document.cookie = 'firebase-auth-token=; path=/; max-age=-1;';
+      }
+    }
+  };
+
+  // On the server, and on the initial client render, don't render children.
+  // This prevents the hydration mismatch.
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading, loginAs }}>
