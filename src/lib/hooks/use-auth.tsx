@@ -29,11 +29,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // This is for the demo mode to allow switching between users.
   // In a real app, you would remove `loginAs` and the corresponding logic.
   const [demoRole, setDemoRole] = useState<'admin' | 'staff' | 'student' | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Access localStorage only on the client
-    setDemoRole((localStorage.getItem('demoRole') as 'admin' | 'staff' | 'student' | null) ?? 'student');
+    // This ensures that any logic depending on localStorage only runs on the client.
+    setIsClient(true);
+    setDemoRole((localStorage.getItem('demoRole') as 'admin' | 'staff' | 'student' | null));
   }, []);
+
 
   const loginAs = (role: 'admin' | 'staff' | 'student' | null) => {
     setDemoRole(role);
@@ -48,8 +51,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
   useEffect(() => {
-    // Don't run auth logic until the demoRole has been determined from localStorage
-    if (demoRole === null && typeof window !== 'undefined') {
+    // Don't run auth logic on the server or until the client has mounted
+    if (!isClient) {
       return;
     }
 
@@ -89,7 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, [demoRole]);
+  }, [demoRole, isClient]);
 
   return (
     <AuthContext.Provider value={{ user, loading, loginAs }}>
