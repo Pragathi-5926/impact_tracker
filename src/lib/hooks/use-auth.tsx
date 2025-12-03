@@ -28,12 +28,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // This is for the demo mode to allow switching between users.
   // In a real app, you would remove `loginAs` and the corresponding logic.
-  const [demoRole, setDemoRole] = useState<'admin' | 'staff' | 'student' | null>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('demoRole') as 'admin' | 'staff' | 'student' | null) ?? 'student';
-    }
-    return 'student';
-  });
+  const [demoRole, setDemoRole] = useState<'admin' | 'staff' | 'student' | null>(null);
+
+  useEffect(() => {
+    // Access localStorage only on the client
+    setDemoRole((localStorage.getItem('demoRole') as 'admin' | 'staff' | 'student' | null) ?? 'student');
+  }, []);
 
   const loginAs = (role: 'admin' | 'staff' | 'student' | null) => {
     setDemoRole(role);
@@ -48,6 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
   useEffect(() => {
+    // Don't run auth logic until the demoRole has been determined from localStorage
+    if (demoRole === null && typeof window !== 'undefined') {
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
       // START MOCK LOGIC - Remove for production
       if (process.env.NEXT_PUBLIC_MOCK_AUTH === 'true' || !firebaseUser) {
