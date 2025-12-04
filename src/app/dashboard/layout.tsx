@@ -1,8 +1,5 @@
 import { SidebarNav } from '@/components/dashboard/sidebar-nav';
 import { UserNav } from '@/components/dashboard/user-nav';
-import { PanelLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Logo } from '@/components/logo';
 
 export default function DashboardLayout({
@@ -12,26 +9,20 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex min-h-screen w-full bg-muted/40">
-      <div className="hidden border-r bg-background sm:block">
+      <div className="w-64 border-r bg-background hidden sm:block">
         <SidebarNav />
       </div>
       <div className="flex flex-col flex-1">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button size="icon" variant="outline" className="sm:hidden">
-                <PanelLeft className="h-5 w-5" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="sm:max-w-xs">
-               <SidebarNav isMobile />
-            </SheetContent>
-          </Sheet>
+          <div className="flex h-14 items-center px-4 lg:px-6 sm:hidden">
+            <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+              <Logo />
+            </Link>
+          </div>
           <div className="relative ml-auto flex-1 md:grow-0" />
           <UserNav />
         </header>
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+        <main className="flex-1 p-4 sm:p-6">
           {children}
         </main>
       </div>

@@ -29,6 +29,7 @@ const navItemsByRole: Record<UserRole, { href: string; label: string; icon: any 
     { href: '/dashboard/staff', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/dashboard/staff/verify', label: 'Verify Submissions', icon: CheckSquare },
     { href: '/dashboard/staff/analytics', label: 'Analytics', icon: TrendingUp },
+    { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
   ],
   student: [
     { href: '/dashboard/student', label: 'My Dashboard', icon: LayoutDashboard },
@@ -36,6 +37,7 @@ const navItemsByRole: Record<UserRole, { href: string; label: string; icon: any 
     { href: '/dashboard/student/progress', label: 'My Progress', icon: TrendingUp },
     { href: '/dashboard/student/leaderboard', label: 'Leaderboard', icon: Award },
     { href: '/dashboard/student/reports', label: 'My Reports', icon: FileText },
+    { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
   ],
 };
 
@@ -55,7 +57,7 @@ export function SidebarNav({ isMobile = false }: { isMobile?: boolean }) {
           <Logo />
         </Link>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 overflow-auto py-2">
         <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
           {currentNav.map((item) => (
             <Link
