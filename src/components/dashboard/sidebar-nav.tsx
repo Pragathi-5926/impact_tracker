@@ -35,12 +35,14 @@ const studentNav = [
   { href: '/dashboard/student/progress', label: 'My Progress', icon: TrendingUp },
   { href: '/dashboard/student/leaderboard', label: 'Leaderboard', icon: Award },
   { href: '/dashboard/student/reports', label: 'Reports', icon: FileText },
+  { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
 ];
 
 const staffNav = [
   { href: '/dashboard/staff', label: 'Home', icon: Home },
   { href: '/dashboard/staff/verify', label: 'Verify Submissions', icon: CheckSquare },
   { href: '/dashboard/staff/analytics', label: 'Department Analytics', icon: BarChart2 },
+  { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
 ];
 
 const adminNav = [
