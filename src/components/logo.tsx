@@ -15,7 +15,6 @@ export function Logo({
         width={40}
         height={40}
         className="rounded-lg"
-        unoptimized
       />
       {showText && (
         <span className="font-bold text-2xl text-primary">SDG TRACKER</span>
