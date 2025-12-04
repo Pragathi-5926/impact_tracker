@@ -7,9 +7,8 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
-import { RadioGroup, RadioGroupItem } from './ui/radio-group';
-import { UserRole } from '@/lib/types';
 import { DUMMY_USERS } from '@/lib/data';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 export function AuthForm() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -19,28 +18,44 @@ export function AuthForm() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    // This is a mock sign in.
+    const formData = new FormData(e.target as HTMLFormElement);
+    const userId = formData.get('user') as string | null;
+    
+    if (!userId) {
+        toast({
+            variant: 'destructive',
+            title: 'Login Failed',
+            description: 'Please select a user to log in as.',
+        });
+        return;
+    }
+    
+    const userToLogin = DUMMY_USERS.find(u => u.uid === userId);
+
+    if (!userToLogin) {
+        toast({
+            variant: 'destructive',
+            title: 'Login Failed',
+            description: 'Selected user not found.',
+        });
+        return;
+    }
+
     toast({
       title: 'Login Successful',
       description: 'Redirecting to your dashboard...',
     });
-    // In a real app, you would get the role from the database.
-    // For the demo, we use the radio button selection.
-    const formData = new FormData(e.target as HTMLFormElement);
-    const role = formData.get('role') as UserRole;
-    loginAs(role);
+
+    loginAs(userToLogin.uid);
     router.push('/dashboard');
   };
-
-  const uniqueRoles: UserRole[] = Array.from(new Set(DUMMY_USERS.map(u => u.role)));
-
 
   return (
     <>
       <form onSubmit={handleSignIn} className="grid gap-4">
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input id="email" type="email" placeholder="m@example.com" required defaultValue="demo@example.com" />
         </div>
         <div className="grid gap-2">
           <div className="flex items-center">
@@ -58,21 +73,23 @@ export function AuthForm() {
               </a>
             )}
           </div>
-          <Input id="password" type="password" required />
+          <Input id="password" type="password" required defaultValue="password" />
         </div>
         {!isSignUp && (
           <div className="grid gap-2 text-center my-4">
-            <Label>Select your role to login</Label>
-            <RadioGroup name="role" defaultValue="student" className="flex gap-4 justify-center pt-2">
-              {uniqueRoles.map((role) => (
-                 <div key={role} className="flex items-center space-x-2">
-                  <RadioGroupItem value={role} id={`role-${role}`} />
-                   <Label className="capitalize" htmlFor={`role-${role}`}>
-                    {role}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+            <Label>Select a user to login as</Label>
+            <Select name="user">
+              <SelectTrigger>
+                <SelectValue placeholder="Select a user..." />
+              </SelectTrigger>
+              <SelectContent>
+                {DUMMY_USERS.map((user) => (
+                  <SelectItem key={user.uid} value={user.uid}>
+                    {user.displayName} ({user.role})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
         <Button type="submit" className="w-full">

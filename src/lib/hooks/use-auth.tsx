@@ -16,8 +16,8 @@ import { DUMMY_USERS } from '@/lib/data';
 interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
-  // This function allows switching users in demo mode
-  loginAs: (role: UserRole | null) => void;
+  // This function allows switching users in demo mode by userId
+  loginAs: (userId: string | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,30 +28,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // This effect runs only once on the client after initial mount.
     setIsClient(true);
-    
-    // Read the initial role from localStorage
-    const savedRole = localStorage.getItem('demoRole') as UserRole | null;
+  }, []);
 
-    // Set up the authentication state listener
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
-      // START MOCK LOGIC - Remove for production
-      if (process.env.NEXT_PUBLIC_MOCK_AUTH === 'true' || !firebaseUser) {
-        // Use the role from localStorage for the initial client render
-        const currentRole = localStorage.getItem('demoRole') as UserRole | null;
-        const mockUser = DUMMY_USERS.find((u) => u.role === currentRole) as UserProfile | undefined;
+  useEffect(() => {
+    if (!isClient) return;
+
+    // Read the initial user ID from localStorage
+    const savedUserId = localStorage.getItem('demoUserId');
+    
+    if (savedUserId) {
+        const mockUser = DUMMY_USERS.find((u) => u.uid === savedUserId) as UserProfile | undefined;
         setUser(mockUser || null);
-        
-        if (typeof document !== 'undefined') {
-          if (mockUser && currentRole) {
+        if (mockUser) {
             document.cookie = `firebase-auth-token=mock-token; path=/; max-age=3600`;
-          } else {
-            document.cookie = 'firebase-auth-token=; path=/; max-age=-1;';
-          }
         }
+    }
+
+
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: User | null) => {
+      if (process.env.NEXT_PUBLIC_MOCK_AUTH === 'true' || !firebaseUser) {
+        // The logic is now handled by the loginAs function and the initial localStorage read
       } else {
-      // END MOCK LOGIC
         if (firebaseUser) {
           const userDocRef = doc(db, 'users', firebaseUser.uid);
           const userDoc = await getDoc(userDocRef);
@@ -70,28 +68,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    return () => unsubscribe();
-  }, []);
+    setLoading(false);
+    return () => {
+        if(unsubscribe) unsubscribe();
+    };
+  }, [isClient]);
 
-  const loginAs = (role: UserRole | null) => {
+  const loginAs = (userId: string | null) => {
     if (typeof window !== 'undefined') {
-      if (role) {
-        localStorage.setItem('demoRole', role);
-        const mockUser = DUMMY_USERS.find((u) => u.role === role) as UserProfile | undefined;
+      if (userId) {
+        localStorage.setItem('demoUserId', userId);
+        const mockUser = DUMMY_USERS.find((u) => u.uid === userId) as UserProfile | undefined;
         setUser(mockUser || null);
         document.cookie = `firebase-auth-token=mock-token; path=/; max-age=3600`;
       } else {
-        localStorage.removeItem('demoRole');
+        localStorage.removeItem('demoUserId');
         setUser(null);
         document.cookie = 'firebase-auth-token=; path=/; max-age=-1;';
       }
     }
   };
-
-  // On the server, and on the initial client render, don't render children.
-  // This prevents the hydration mismatch.
-  if (!isClient) {
-    return null;
+  
+  if (loading && !isClient) {
+    return null; 
   }
 
   return (
