@@ -57,12 +57,12 @@ export function AuthForm() {
     <>
       <form onSubmit={handleSignIn} className="grid gap-4">
         <div className="grid gap-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="text-base">Email</Label>
           <Input id="email" type="email" placeholder="m@example.com" required defaultValue="demo@example.com" />
         </div>
         <div className="grid gap-2">
           <div className="flex items-center">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-base">Password</Label>
             {isSignUp && (
               <a
                 href="#"
@@ -80,7 +80,7 @@ export function AuthForm() {
         </div>
         {!isSignUp && (
           <div className="grid gap-2 text-center my-4">
-            <Label className="text-base font-medium capitalize">Select Your Role To Login</Label>
+            <Label className="font-medium text-base capitalize">Select Your Role To Login</Label>
              <RadioGroup 
                 defaultValue="student"
                 className="flex gap-4 justify-center" 
