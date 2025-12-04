@@ -17,7 +17,6 @@ import { usePathname } from 'next/navigation';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/lib/hooks/use-auth';
 import type { UserRole } from '@/lib/types';
-import { Separator } from '../ui/separator';
 
 const navItemsByRole: Record<UserRole, { href: string; label: string; icon: any }[]> = {
   admin: [
@@ -42,7 +41,7 @@ const navItemsByRole: Record<UserRole, { href: string; label: string; icon: any 
 };
 
 
-export function SidebarNav({ isMobile = false }: { isMobile?: boolean }) {
+export function SidebarNav() {
   const { user } = useAuth();
   const pathname = usePathname();
 
@@ -50,14 +49,14 @@ export function SidebarNav({ isMobile = false }: { isMobile?: boolean }) {
 
   const currentNav = navItemsByRole[user.role] || [];
   
-  const navContent = (
-    <nav className="flex flex-col h-full">
+  return (
+    <div className="flex h-full max-h-screen flex-col gap-2">
       <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
         <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
           <Logo />
         </Link>
       </div>
-      <div className="flex-1 overflow-auto py-2">
+      <div className="flex-1">
         <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
           {currentNav.map((item) => (
             <Link
@@ -73,16 +72,6 @@ export function SidebarNav({ isMobile = false }: { isMobile?: boolean }) {
           ))}
         </nav>
       </div>
-    </nav>
-  );
-
-  if (isMobile) {
-    return navContent;
-  }
-
-  return (
-    <div className="flex h-full max-h-screen flex-col gap-2">
-      {navContent}
     </div>
   );
 }
