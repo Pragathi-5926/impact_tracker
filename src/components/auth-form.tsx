@@ -80,7 +80,7 @@ export function AuthForm() {
         </div>
         {!isSignUp && (
           <div className="grid gap-2 text-center my-4">
-            <Label className="text-base font-medium">Select Your Role To Login</Label>
+            <Label className="text-base font-medium capitalize">Select Your Role To Login</Label>
              <RadioGroup 
                 defaultValue="student"
                 className="flex gap-4 justify-center" 
@@ -96,7 +96,7 @@ export function AuthForm() {
           </div>
         )}
         <Button type="submit" className="w-full">
-          {isSignUp ? 'Create an account' : 'Login'}
+          {isSignUp ? 'Create an account' : 'LOGIN'}
         </Button>
       </form>
       
