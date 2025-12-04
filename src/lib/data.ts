@@ -1,9 +1,138 @@
 import type { Activity, UserProfile } from './types';
 
 // This is a simplified UserProfile for dummy data, as we don't have a full Firebase User object
-export const DUMMY_USERS: Omit<UserProfile, keyof import('firebase/auth').User | 'providerId' >[] = [];
+export const DUMMY_USERS: Omit<UserProfile, keyof import('firebase/auth').User | 'providerId' >[] = [
+  {
+    uid: 'admin-01',
+    displayName: 'Alex Johnson',
+    email: 'alex.j@campus.edu',
+    photoURL: 'https://i.pravatar.cc/150?u=admin-01',
+    role: 'admin',
+  },
+  {
+    uid: 'staff-01',
+    displayName: 'Dr. Maria Garcia',
+    email: 'm.garcia@campus.edu',
+    photoURL: 'https://i.pravatar.cc/150?u=staff-01',
+    role: 'staff',
+    department: 'Computer Science',
+  },
+  {
+    uid: 'staff-02',
+    displayName: 'Prof. David Chen',
+    email: 'd.chen@campus.edu',
+    photoURL: 'https://i.pravatar.cc/150?u=staff-02',
+    role: 'staff',
+    department: 'Environmental Science',
+  },
+  {
+    uid: 'student-01',
+    displayName: 'Samantha Lee',
+    email: 's.lee@campus.edu',
+    photoURL: 'https://i.pravatar.cc/150?u=student-01',
+    role: 'student',
+    department: 'Computer Science',
+  },
+  {
+    uid: 'student-02',
+    displayName: 'Ben Carter',
+    email: 'b.carter@campus.edu',
+    photoURL: 'https://i.pravatar.cc/150?u=student-02',
+    role: 'student',
+    department: 'Environmental Science',
+  },
+  {
+    uid: 'student-03',
+    displayName: 'Chloe Kim',
+    email: 'c.kim@campus.edu',
+    photoURL: 'https://i.pravatar.cc/150?u=student-03',
+    role: 'student',
+    department: 'Business',
+  },
+];
 
 
-export const DUMMY_ACTIVITIES: Activity[] = [];
+export const DUMMY_ACTIVITIES: Activity[] = [
+    {
+        id: 'act-001',
+        studentId: 'student-01',
+        studentName: 'Samantha Lee',
+        description: 'Developed a mobile app to track local recycling centers and pickup schedules.',
+        sdgGoals: [11, 12],
+        documentationLinks: ['https://github.com/sammylee/recycling-app-repo'],
+        status: 'approved',
+        submittedAt: new Date('2024-05-10T10:00:00Z'),
+        verifiedBy: 'staff-01',
+        verifiedAt: new Date('2024-05-11T14:30:00Z'),
+        points: 25,
+    },
+    {
+        id: 'act-002',
+        studentId: 'student-02',
+        studentName: 'Ben Carter',
+        description: 'Organized a tree-planting event on campus, planting over 50 native trees.',
+        sdgGoals: [13, 15],
+        documentationLinks: ['https://campusnews.com/tree-planting-drive-success'],
+        status: 'approved',
+        submittedAt: new Date('2024-05-12T09:00:00Z'),
+        verifiedBy: 'staff-02',
+        verifiedAt: new Date('2024-05-13T11:00:00Z'),
+        points: 20,
+    },
+    {
+        id: 'act-003',
+        studentId: 'student-03',
+        studentName: 'Chloe Kim',
+        description: 'Conducted a workshop on financial literacy for first-year students.',
+        sdgGoals: [4, 8],
+        documentationLinks: ['https://flic.kr/p/2pYjJk5', 'https://flic.kr/p/2pYjJk1'],
+        status: 'pending',
+        submittedAt: new Date('2024-05-15T16:20:00Z'),
+        points: 0,
+    },
+     {
+        id: 'act-004',
+        studentId: 'student-01',
+        studentName: 'Samantha Lee',
+        description: 'Volunteered at a local food bank to distribute meals to those in need.',
+        sdgGoals: [1, 2],
+        documentationLinks: ['https://example.com/food-bank-volunteer-cert.pdf'],
+        status: 'pending',
+        submittedAt: new Date('2024-05-16T11:45:00Z'),
+        points: 0,
+    },
+    {
+        id: 'act-005',
+        studentId: 'student-02',
+        studentName: 'Ben Carter',
+        description: 'Participated in a coastal cleanup, removing plastic waste from a local beach.',
+        sdgGoals: [14],
+        documentationLinks: ['https://example.com/coastal-cleanup-2024-photos'],
+        status: 'rejected',
+        submittedAt: new Date('2024-05-01T13:00:00Z'),
+        verifiedBy: 'staff-02',
+        verifiedAt: new Date('2024-05-02T18:00:00Z'),
+        feedback: 'Documentation link is broken. Please provide a valid link.',
+        points: 0,
+    }
+];
 
-export const SDG_GOALS: { id: number; name: string; color: string; }[] = [];
+export const SDG_GOALS: { id: number; name: string; color: string; }[] = [
+    { id: 1, name: "No Poverty", color: "#E5243B" },
+    { id: 2, name: "Zero Hunger", color: "#DDA63A" },
+    { id: 3, name: "Good Health and Well-being", color: "#4C9F38" },
+    { id: 4, name: "Quality Education", color: "#C5192D" },
+    { id: 5, name: "Gender Equality", color: "#FF3A21" },
+    { id: 6, name: "Clean Water and Sanitation", color: "#26BDE2" },
+    { id: 7, name: "Affordable and Clean Energy", color: "#FCC30B" },
+    { id: 8, name: "Decent Work and Economic Growth", color: "#A21942" },
+    { id: 9, name: "Industry, Innovation, and Infrastructure", color: "#FD6925" },
+    { id: 10, name: "Reduced Inequalities", color: "#DD1367" },
+    { id: 11, name: "Sustainable Cities and Communities", color: "#FD9D24" },
+    { id: 12, name: "Responsible Consumption and Production", color: "#BF8B2E" },
+    { id: 13, name: "Climate Action", color: "#3F7E44" },
+    { id: 14, name: "Life Below Water", color: "#0A97D9" },
+    { id: 15, name: "Life on Land", color: "#56C02B" },
+    { id: 16, name: "Peace, Justice, and Strong Institutions", color: "#00689D" },
+    { id: 17, name: "Partnerships for the Goals", color: "#19486A" }
+];
