@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "login-background",
-      "description": "A diverse group of students collaborating on a project outdoors.",
-      "imageUrl": "https://images.unsplash.com/photo-1758270705172-07b53627dfcb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzdHVkZW50cyUyMGNvbGxhYm9yYXRpbmd8ZW58MHx8fHwxNzY0NzIxNzgwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "students collaborating"
+      "description": "An infographic showing the Sustainable Development Goals.",
+      "imageUrl": "https://img.freepik.com/free-vector/gradient-sdg-infographic_23-2149396367.jpg?w=740",
+      "imageHint": "SDG infographic"
     }
   ]
 }
