@@ -11,6 +11,7 @@ import {
   Award,
   FileText,
   PanelLeft,
+  LayoutDashboard,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -28,49 +29,18 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import type { UserRole } from '@/lib/types';
 import { Separator } from '../ui/separator';
 
-const studentNav = [
-  { href: '/dashboard/student', label: 'Home', icon: Home },
-  { href: '/dashboard/student/add-activity', label: 'Add Activity', icon: PlusCircle },
-  { href: '/dashboard/student/progress', label: 'My Progress', icon: TrendingUp },
-  { href: '/dashboard/student/leaderboard', label: 'Leaderboard', icon: Award },
-  { href: '/dashboard/student/reports', label: 'Reports', icon: FileText },
-];
-
-const staffNav = [
-  { href: '/dashboard/staff', label: 'Home', icon: Home },
-  { href: '/dashboard/staff/verify', label: 'Verify Submissions', icon: CheckSquare },
-  { href: '/dashboard/staff/analytics', label: 'Department Analytics', icon: BarChart2 },
-];
-
-const adminNav = [
+const navItems = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/admin', label: 'Home & Members', icon: Home },
   { href: '/dashboard/admin/reports', label: 'Department Reports', icon: BarChart2 },
-];
-
-const sharedNav = [
   { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
 ];
-
-const navItems: Record<UserRole, typeof studentNav> = {
-  student: studentNav,
-  staff: staffNav,
-  admin: adminNav,
-};
 
 export function SidebarNav() {
   const { user } = useAuth();
   const pathname = usePathname();
 
   if (!user) return null;
-
-  let currentNav = navItems[user.role] || [];
-  
-  if (user.role === 'student' || user.role === 'staff') {
-    currentNav = [...currentNav, ...sharedNav];
-  } else {
-    currentNav = [...adminNav, ...sharedNav];
-  }
-
 
   return (
     <Sidebar>
@@ -80,7 +50,7 @@ export function SidebarNav() {
       <Separator />
       <SidebarContent>
         <SidebarMenu>
-          {currentNav.map((item) => (
+          {navItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
