@@ -16,7 +16,7 @@ export default function LoginPage() {
             <Logo className="justify-center" />
             <h1 className="text-3xl font-bold mt-4">Welcome Back</h1>
             <p className="text-balance text-muted-foreground">
-              Enter your credentials to access your dashboard
+              Enter Your Credentials To Access Your Dashboard
             </p>
           </div>
           <AuthForm />
