@@ -9,6 +9,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { DUMMY_USERS } from '@/lib/data';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export function AuthForm() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -20,13 +27,21 @@ export function AuthForm() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!demoRole) {
+    if (!demoRole && !isSignUp) {
       toast({
         variant: 'destructive',
         title: 'Login Failed',
         description: 'Please select a role to log in as.',
       });
       return;
+    }
+    
+    if (isSignUp) {
+        toast({
+            title: 'Sign Up (Demo)',
+            description: 'Account creation is not implemented in this demo.',
+        });
+        return;
     }
     
     const userToLogin = DUMMY_USERS.find((u) => u.role === demoRole);
@@ -56,9 +71,15 @@ export function AuthForm() {
   return (
     <>
       <form onSubmit={handleSignIn} className="grid gap-4">
+        {isSignUp && (
+            <div className="grid gap-2">
+                <Label htmlFor="name" className="text-base">Full Name</Label>
+                <Input id="name" placeholder="John Doe" required />
+            </div>
+        )}
         <div className="grid gap-2">
           <Label htmlFor="email" className="text-base">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required defaultValue="demo@example.com" />
+          <Input id="email" type="email" placeholder="m@example.com" required defaultValue={isSignUp ? '' : 'demo@example.com'} />
         </div>
         <div className="grid gap-2">
           <div className="flex items-center">
@@ -76,8 +97,23 @@ export function AuthForm() {
               </a>
             )}
           </div>
-          <Input id="password" type="password" required defaultValue="password" />
+          <Input id="password" type="password" required defaultValue={isSignUp ? '' : 'password'} />
         </div>
+        {isSignUp && (
+            <div className="grid gap-2">
+                <Label htmlFor="role-signup" className="text-base">Role</Label>
+                <Select name="role-signup" required>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Select a role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="staff">Staff / HoD</SelectItem>
+                        <SelectItem value="student">Student</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+        )}
         {!isSignUp && (
           <div className="grid gap-2 text-center my-4">
             <Label className="font-medium text-base capitalize">Select Your Role To Login</Label>
