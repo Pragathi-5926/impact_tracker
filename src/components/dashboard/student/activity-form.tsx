@@ -1,5 +1,6 @@
 'use client';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { addActivity } from '@/app/actions';
@@ -42,7 +43,7 @@ export function ActivityForm() {
   if (!user) return null;
 
   const addActivityWithStudentId = addActivity.bind(null, user.uid, user.displayName || 'Student');
-  const [state, dispatch] = useFormState(addActivityWithStudentId, initialState);
+  const [state, dispatch] = useActionState(addActivityWithStudentId, initialState);
 
   const { toast } = useToast();
 

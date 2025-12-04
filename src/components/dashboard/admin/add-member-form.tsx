@@ -1,5 +1,6 @@
 'use client';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { addMember } from '@/app/actions';
@@ -33,7 +34,7 @@ function SubmitButton() {
 
 export function AddMemberForm() {
   const initialState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(addMember, initialState);
+  const [state, dispatch] = useActionState(addMember, initialState);
   const { toast } = useToast();
 
   useEffect(() => {
