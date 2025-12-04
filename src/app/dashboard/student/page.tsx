@@ -28,19 +28,19 @@ export default function StudentDashboard() {
   
   const rank = allStudentsPoints.findIndex(s => s.name === user.displayName) + 1;
 
-  const progressData = studentActivities
-    .filter(a => a.status === 'approved')
-    .sort((a, b) => new Date(a.submittedAt as Date).getTime() - new Date(b.submittedAt as Date).getTime())
-    .map(a => ({
-        date: format(new Date(a.submittedAt as Date), 'MMM d'),
-        points: a.points
-    }));
-    
-  let cumulativePoints = 0;
-  const cumulativeProgressData = progressData.map(item => {
-    cumulativePoints += item.points;
-    return { ...item, points: cumulativePoints };
-  });
+  const monthlySubmissions = studentActivities.reduce((acc, activity) => {
+    const month = format(new Date(activity.submittedAt as Date), 'MMM');
+    acc[month] = (acc[month] || 0) + 1;
+    return acc;
+    }, {} as Record<string, number>);
+
+  const monthOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  const monthlyChartData = monthOrder.map(month => ({
+    month: month,
+    activities: monthlySubmissions[month] || 0,
+  })).filter(d => d.activities > 0);
+
 
   return (
     <div className="container mx-auto p-4 md:p-6">
@@ -58,11 +58,11 @@ export default function StudentDashboard() {
 
       <div className="grid gap-8 lg:grid-cols-2">
         <SDGBarChart 
-            data={cumulativeProgressData}
-            title="My Progress"
-            description="Your cumulative SDG points over time, based on submission date."
-            dataKey="points"
-            xAxisKey="date"
+            data={monthlyChartData}
+            title="My Monthly Submissions"
+            description="Total number of activities you submitted each month."
+            dataKey="activities"
+            xAxisKey="month"
         />
 
         <Card>
