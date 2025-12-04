@@ -40,9 +40,7 @@ export function ActivityForm() {
   const { user } = useAuth();
   const initialState = { message: null, errors: {} };
   
-  if (!user) return null;
-
-  const addActivityWithStudentId = addActivity.bind(null, user.uid, user.displayName || 'Student');
+  const addActivityWithStudentId = addActivity.bind(null, user?.uid || '', user?.displayName || 'Student');
   const [state, dispatch] = useActionState(addActivityWithStudentId, initialState);
 
   const { toast } = useToast();
@@ -61,6 +59,8 @@ export function ActivityForm() {
       });
     }
   }, [state, toast]);
+  
+  if (!user) return null;
 
   return (
     <form action={dispatch}>
@@ -91,7 +91,7 @@ export function ActivityForm() {
               name="documentationFile"
               type="file"
             />
-            {state.errors?.documentationLinks && <p className="text-sm font-medium text-destructive">{state.errors.documentationLinks[0]}</p>}
+            {state.errors?.documentationFile && <p className="text-sm font-medium text-destructive">{state.errors.documentationFile[0]}</p>}
           </div>
 
           <div className="space-y-2">
