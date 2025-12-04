@@ -1,4 +1,4 @@
-import { Globe } from 'lucide-react';
+import Image from 'next/image';
 
 export function Logo({
   className,
@@ -9,9 +9,13 @@ export function Logo({
 }) {
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <div className="bg-primary text-primary-foreground p-2 rounded-lg">
-        <Globe className="h-5 w-5" />
-      </div>
+      <Image
+        src="https://raw.githubusercontent.com/Pragathi-5926/IDL/6d2c826624b4dc6db67a01c3dfd948723113225f/idl.jpeg"
+        alt="SDG Tracker Logo"
+        width={32}
+        height={32}
+        className="rounded-lg"
+      />
       {showText && (
         <span className="font-bold text-2xl text-primary">SDG TRACKER</span>
       )}
