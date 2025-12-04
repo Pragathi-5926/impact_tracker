@@ -4,7 +4,7 @@ import { AuthProvider } from '@/lib/hooks/use-auth';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'CampusConnect SDG',
+  title: 'SDG Tracker',
   description: 'Track and manage Sustainable Development Goal activities on campus.',
 };
 

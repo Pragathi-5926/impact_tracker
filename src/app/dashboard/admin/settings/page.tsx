@@ -23,13 +23,13 @@ export default function AdminSettingsPage() {
         <CardHeader>
           <CardTitle>Application Settings</CardTitle>
           <CardDescription>
-            Global settings for the CampusConnect SDG app.
+            Global settings for the SDG Tracker app.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="appName">Application Name</Label>
-            <Input id="appName" defaultValue="CampusConnect SDG" />
+            <Input id="appName" defaultValue="SDG Tracker" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="term">Current Academic Term</Label>

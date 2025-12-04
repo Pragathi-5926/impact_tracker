@@ -13,7 +13,7 @@ export function Logo({
         <Leaf className="h-5 w-5" />
       </div>
       {showText && (
-        <span className="font-bold text-lg text-primary">CampusConnect</span>
+        <span className="font-bold text-lg text-primary">SDG TRACKER</span>
       )}
     </div>
   );
