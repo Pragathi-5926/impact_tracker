@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { SidebarNav } from '@/components/dashboard/sidebar-nav';
 import { UserNav } from '@/components/dashboard/user-nav';
 import { Logo } from '@/components/logo';
