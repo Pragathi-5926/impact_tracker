@@ -35,19 +35,20 @@ const studentNav = [
   { href: '/dashboard/student/progress', label: 'My Progress', icon: TrendingUp },
   { href: '/dashboard/student/leaderboard', label: 'Leaderboard', icon: Award },
   { href: '/dashboard/student/reports', label: 'Reports', icon: FileText },
-  { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
 ];
 
 const staffNav = [
   { href: '/dashboard/staff', label: 'Home', icon: Home },
   { href: '/dashboard/staff/verify', label: 'Verify Submissions', icon: CheckSquare },
   { href: '/dashboard/staff/analytics', label: 'Department Analytics', icon: BarChart2 },
-  { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
 ];
 
 const adminNav = [
   { href: '/dashboard/admin', label: 'Home & Members', icon: Home },
   { href: '/dashboard/admin/reports', label: 'Department Reports', icon: BarChart2 },
+];
+
+const sharedNav = [
   { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -64,18 +65,17 @@ export function SidebarNav() {
   if (!user) return null;
 
   const currentNav = navItems[user.role] || [];
+  const finalNav = [...currentNav, ...sharedNav];
 
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className="flex items-center justify-between w-full">
-            <Logo />
-        </div>
+        <Logo />
       </SidebarHeader>
       <Separator />
       <SidebarContent>
         <SidebarMenu>
-          {currentNav.map((item) => (
+          {finalNav.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
@@ -83,9 +83,7 @@ export function SidebarNav() {
                 icon={<item.icon />}
                 tooltip={item.label}
               >
-                <Link href={item.href}>
-                  {item.label}
-                </Link>
+                <Link href={item.href}>{item.label}</Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
@@ -93,11 +91,13 @@ export function SidebarNav() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuButton icon={<PanelLeft/>} >
-                    Toggle Sidebar
-                </SidebarMenuButton>
-            </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarTrigger asChild>
+              <SidebarMenuButton icon={<PanelLeft />}>
+                Toggle Sidebar
+              </SidebarMenuButton>
+            </SidebarTrigger>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
