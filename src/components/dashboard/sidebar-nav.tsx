@@ -10,63 +10,77 @@ import {
   TrendingUp,
   Award,
   FileText,
-  PanelLeft,
   LayoutDashboard,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-} from '@/components/ui/sidebar';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/lib/hooks/use-auth';
 import type { UserRole } from '@/lib/types';
 import { Separator } from '../ui/separator';
 
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/admin', label: 'Home & Members', icon: Home },
-  { href: '/dashboard/admin/reports', label: 'Department Reports', icon: BarChart2 },
-  { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
-];
+const navItemsByRole: Record<UserRole, { href: string; label: string; icon: any }[]> = {
+  admin: [
+    { href: '/dashboard/admin', label: 'Home & Members', icon: Home },
+    { href: '/dashboard/admin/reports', label: 'Department Reports', icon: BarChart2 },
+    { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
+  ],
+  staff: [
+    { href: '/dashboard/staff', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard/staff/verify', label: 'Verify Submissions', icon: CheckSquare },
+    { href: '/dashboard/staff/analytics', label: 'Analytics', icon: TrendingUp },
+  ],
+  student: [
+    { href: '/dashboard/student', label: 'My Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard/student/add-activity', label: 'Add Activity', icon: PlusCircle },
+    { href: '/dashboard/student/progress', label: 'My Progress', icon: TrendingUp },
+    { href: '/dashboard/student/leaderboard', label: 'Leaderboard', icon: Award },
+    { href: '/dashboard/student/reports', label: 'My Reports', icon: FileText },
+  ],
+};
 
-export function SidebarNav() {
+
+export function SidebarNav({ isMobile = false }: { isMobile?: boolean }) {
   const { user } = useAuth();
   const pathname = usePathname();
 
   if (!user) return null;
 
-  return (
-    <Sidebar>
-      <SidebarHeader>
-        <Logo />
-      </SidebarHeader>
-      <Separator />
-      <SidebarContent>
-        <SidebarMenu>
-          {navItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === item.href}
-                icon={<item.icon />}
-                tooltip={item.label}
-              >
-                <Link href={item.href}>{item.label}</Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+  const currentNav = navItemsByRole[user.role] || [];
+  
+  const navContent = (
+    <nav className="flex flex-col h-full">
+      <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
+        <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
+          <Logo />
+        </Link>
+      </div>
+      <div className="flex-1">
+        <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+          {currentNav.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${
+                pathname === item.href ? 'bg-muted text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              <item.icon className="h-4 w-4" />
+              {item.label}
+            </Link>
           ))}
-        </SidebarMenu>
-      </SidebarContent>
-      <SidebarFooter>
-        
-      </SidebarFooter>
-    </Sidebar>
+        </nav>
+      </div>
+    </nav>
+  );
+
+  if (isMobile) {
+    return navContent;
+  }
+
+  return (
+    <div className="flex h-full max-h-screen flex-col gap-2">
+      {navContent}
+    </div>
   );
 }
