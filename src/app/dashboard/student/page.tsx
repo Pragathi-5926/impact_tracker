@@ -29,10 +29,10 @@ export default function StudentDashboard() {
   const rank = allStudentsPoints.findIndex(s => s.name === user.displayName) + 1;
 
   const progressData = studentActivities
-    .filter(a => a.status === 'approved' && a.verifiedAt)
-    .sort((a, b) => new Date(a.verifiedAt!).getTime() - new Date(b.verifiedAt!).getTime())
+    .filter(a => a.status === 'approved')
+    .sort((a, b) => new Date(a.submittedAt as Date).getTime() - new Date(b.submittedAt as Date).getTime())
     .map(a => ({
-        date: format(new Date(a.verifiedAt!), 'MMM d'),
+        date: format(new Date(a.submittedAt as Date), 'MMM d'),
         points: a.points
     }));
     
@@ -60,7 +60,7 @@ export default function StudentDashboard() {
         <SDGBarChart 
             data={cumulativeProgressData}
             title="My Progress"
-            description="Your cumulative SDG points over time."
+            description="Your cumulative SDG points over time, based on submission date."
             dataKey="points"
             xAxisKey="date"
         />
