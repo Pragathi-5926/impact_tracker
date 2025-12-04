@@ -22,7 +22,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { Logo } from '@/components/logo';
 import { useAuth } from '@/lib/hooks/use-auth';
@@ -64,8 +63,14 @@ export function SidebarNav() {
 
   if (!user) return null;
 
-  const currentNav = navItems[user.role] || [];
-  const finalNav = [...currentNav, ...sharedNav];
+  let currentNav = navItems[user.role] || [];
+  
+  if (user.role === 'student' || user.role === 'staff') {
+    currentNav = [...currentNav, ...sharedNav];
+  } else {
+    currentNav = [...adminNav, ...sharedNav];
+  }
+
 
   return (
     <Sidebar>
@@ -75,7 +80,7 @@ export function SidebarNav() {
       <Separator />
       <SidebarContent>
         <SidebarMenu>
-          {finalNav.map((item) => (
+          {currentNav.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
@@ -90,15 +95,7 @@ export function SidebarNav() {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarTrigger asChild>
-              <SidebarMenuButton icon={<PanelLeft />}>
-                Toggle Sidebar
-              </SidebarMenuButton>
-            </SidebarTrigger>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        
       </SidebarFooter>
     </Sidebar>
   );
