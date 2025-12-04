@@ -80,7 +80,7 @@ export function AuthForm() {
         </div>
         {!isSignUp && (
           <div className="grid gap-2 text-center my-4">
-            <Label>Select your role to login</Label>
+            <Label className="text-base">Select your role to login</Label>
              <RadioGroup 
                 defaultValue="student"
                 className="flex gap-4 justify-center" 
