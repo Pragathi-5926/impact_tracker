@@ -25,99 +25,10 @@ export const DUMMY_USERS: Omit<UserProfile, keyof import('firebase/auth').User |
     role: 'student',
     department: 'Computer Science',
   },
-    {
-    uid: 'student02',
-    email: 'student2@campus.com',
-    displayName: 'Maria Garcia',
-    photoURL: 'https://i.pravatar.cc/150?u=student02',
-    role: 'student',
-    department: 'Computer Science',
-  },
-  {
-    uid: 'student03',
-    email: 'student3@campus.com',
-    displayName: 'Chen Wei',
-    photoURL: 'https://i.pravatar.cc/150?u=student03',
-    role: 'student',
-    department: 'Mechanical Engineering',
-  },
 ];
 
 
-export const DUMMY_ACTIVITIES: Activity[] = [
-  {
-    id: 'act001',
-    studentId: 'student01',
-    studentName: 'Alex Johnson',
-    description: 'Organized a campus-wide e-waste collection drive to promote responsible consumption and production.',
-    sdgGoals: [12, 13],
-    documentationLinks: [
-      'https://www.un.org/sustainabledevelopment/sustainable-consumption-production/',
-      'https://www.un.org/sustainabledevelopment/climate-change/',
-    ],
-    status: 'approved',
-    submittedAt: new Date('2023-10-15T10:00:00Z'),
-    points: 20,
-    verifiedBy: 'staff01',
-    verifiedAt: new Date('2023-10-16T14:30:00Z'),
-    feedback: 'Great initiative! Well-documented and impactful.',
-  },
-  {
-    id: 'act002',
-    studentId: 'student02',
-    studentName: 'Maria Garcia',
-    description:
-      'Developed a low-cost water purification filter using locally sourced materials for communities with limited access to clean water.',
-    sdgGoals: [6],
-    documentationLinks: ['https://www.who.int/news-room/fact-sheets/detail/drinking-water'],
-    status: 'approved',
-    submittedAt: new Date('2023-10-20T09:00:00Z'),
-    points: 30,
-    verifiedBy: 'staff01',
-    verifiedAt: new Date('2023-10-21T11:00:00Z'),
-    feedback: 'Excellent project with clear benefits. Approved.',
-  },
-  {
-    id: 'act003',
-    studentId: 'student01',
-    studentName: 'Alex Johnson',
-    description: 'Volunteered at a local food bank to help sort and distribute meals to those in need, addressing zero hunger.',
-    sdgGoals: [2],
-    documentationLinks: ['https://www.wfp.org/zero-hunger'],
-    status: 'pending',
-    submittedAt: new Date('2023-11-01T16:00:00Z'),
-    points: 0,
-  },
-  {
-    id: 'act004',
-    studentId: 'student03',
-    studentName: 'Chen Wei',
-    description: 'Designed and built a small-scale solar panel system for charging mobile devices, promoting affordable and clean energy.',
-    sdgGoals: [7, 11],
-    documentationLinks: [
-      'https://github.com/example/solar-charger',
-      'https://example.com/blog/my-solar-project',
-    ],
-    status: 'pending',
-    submittedAt: new Date('2023-11-02T11:20:00Z'),
-    points: 0,
-  },
-  {
-    id: 'act005',
-    studentId: 'student02',
-    studentName: 'Maria Garcia',
-    description: 'Conducted a campus workshop on gender equality and women\'s empowerment, featuring guest speakers.',
-    sdgGoals: [5],
-    documentationLinks: ['https://www.unwomen.org/en/news/in-focus/international-womens-day'],
-    status: 'rejected',
-    submittedAt: new Date('2023-09-10T14:00:00Z'),
-    points: 0,
-    verifiedBy: 'staff01',
-    verifiedAt: new Date('2023-09-11T10:00:00Z'),
-    feedback:
-      'The documentation link is a general article. Please provide specific evidence of the workshop, such as photos, presentation materials, or a sign-in sheet.',
-  },
-];
+export const DUMMY_ACTIVITIES: Activity[] = [];
 
 export const SDG_GOALS = [
     { id: 1, name: "No Poverty", color: "#E5243B" },
