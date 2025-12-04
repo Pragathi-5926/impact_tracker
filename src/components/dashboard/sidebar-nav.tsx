@@ -70,7 +70,6 @@ export function SidebarNav() {
       <SidebarHeader>
         <div className="flex items-center justify-between w-full">
             <Logo />
-            <SidebarTrigger className="hidden md:flex"><PanelLeft /></SidebarTrigger>
         </div>
       </SidebarHeader>
       <Separator />
