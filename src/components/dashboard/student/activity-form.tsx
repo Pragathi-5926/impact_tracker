@@ -85,12 +85,11 @@ export function ActivityForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="documentationLinks">Documentation Link</Label>
+            <Label htmlFor="documentationFile">Documentation File</Label>
             <Input
-              id="documentationLinks"
-              name="documentationLinks"
-              type="url"
-              placeholder="https://example.com/proof"
+              id="documentationFile"
+              name="documentationFile"
+              type="file"
             />
             {state.errors?.documentationLinks && <p className="text-sm font-medium text-destructive">{state.errors.documentationLinks[0]}</p>}
           </div>

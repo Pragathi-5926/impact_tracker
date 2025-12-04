@@ -38,7 +38,7 @@ export async function addMember(prevState: any, formData: FormData) {
 
 const addActivitySchema = z.object({
   description: z.string().min(10, 'Description must be at least 10 characters.'),
-  documentationLinks: z.string().url('Please provide a valid URL.').or(z.literal('')),
+  documentationFile: z.any().optional(), // We'll mock file handling
   sdgGoals: z.preprocess((val) => (Array.isArray(val) ? val : [val]), z.array(z.string())),
 });
 
@@ -46,7 +46,7 @@ export async function addActivity(studentId: string, studentName: string, prevSt
   try {
     const rawData = {
       description: formData.get('description'),
-      documentationLinks: formData.get('documentationLinks'),
+      documentationFile: formData.get('documentationFile'),
       sdgGoals: formData.getAll('sdgGoals')
     };
     const validatedFields = addActivitySchema.safeParse(rawData);
@@ -58,14 +58,17 @@ export async function addActivity(studentId: string, studentName: string, prevSt
       };
     }
 
-    const { description, documentationLinks, sdgGoals } = validatedFields.data;
+    const { description, documentationFile, sdgGoals } = validatedFields.data;
     
-    // In a real app, you would add this to Firestore.
+    // In a real app, you would upload the file to storage and get a URL.
+    // For this demo, we'll just log the file name if it exists.
+    const documentationLinks = documentationFile?.name ? [`/uploads/${documentationFile.name}`] : [];
+
     console.log('Adding new activity (mock):', { 
       studentId, 
       studentName,
       description,
-      documentationLinks: documentationLinks ? [documentationLinks] : [],
+      documentationLinks: documentationLinks,
       sdgGoals: sdgGoals.map(Number),
       status: 'pending',
       submittedAt: new Date(),
@@ -75,7 +78,7 @@ export async function addActivity(studentId: string, studentName: string, prevSt
     //   studentId,
     //   studentName,
     //   description,
-    //   documentationLinks: documentationLinks ? [documentationLinks] : [],
+    //   documentationLinks,
     //   sdgGoals: sdgGoals.map(Number),
     //   status: 'pending',
     //   submittedAt: serverTimestamp(),
