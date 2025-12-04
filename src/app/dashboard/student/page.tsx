@@ -4,7 +4,7 @@ import { StatCard } from '@/components/dashboard/stat-card';
 import { Award, CheckCircle2, TrendingUp, Hourglass } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { DUMMY_ACTIVITIES, DUMMY_USERS } from '@/lib/data';
-import { SDGAreaChart } from '@/components/dashboard/chart-components';
+import { SDGBarChart } from '@/components/dashboard/chart-components';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -57,7 +57,7 @@ export default function StudentDashboard() {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <SDGAreaChart 
+        <SDGBarChart 
             data={cumulativeProgressData}
             title="My Progress"
             description="Your cumulative SDG points over time."
