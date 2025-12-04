@@ -8,37 +8,36 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { DUMMY_USERS } from '@/lib/data';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 
 export function AuthForm() {
   const [isSignUp, setIsSignUp] = useState(false);
-  const { loginAs } = useAuth();
+  const [demoRole, setDemoRole] = useState<'admin' | 'staff' | 'student' | null>(null);
+  const { loginAs, loading } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const userId = formData.get('user') as string | null;
-    
-    if (!userId) {
-        toast({
-            variant: 'destructive',
-            title: 'Login Failed',
-            description: 'Please select a user to log in as.',
-        });
-        return;
+
+    if (!demoRole) {
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: 'Please select a role to log in as.',
+      });
+      return;
     }
     
-    const userToLogin = DUMMY_USERS.find(u => u.uid === userId);
+    const userToLogin = DUMMY_USERS.find((u) => u.role === demoRole);
 
     if (!userToLogin) {
-        toast({
-            variant: 'destructive',
-            title: 'Login Failed',
-            description: 'Selected user not found.',
-        });
-        return;
+      toast({
+        variant: 'destructive',
+        title: 'Login Failed',
+        description: 'No user found for the selected role.',
+      });
+      return;
     }
 
     toast({
@@ -49,6 +48,10 @@ export function AuthForm() {
     loginAs(userToLogin.uid);
     router.push('/dashboard');
   };
+
+  const uniqueRoles = [...new Set(DUMMY_USERS.map(user => user.role))];
+
+  if (loading) return null;
 
   return (
     <>
@@ -77,19 +80,19 @@ export function AuthForm() {
         </div>
         {!isSignUp && (
           <div className="grid gap-2 text-center my-4">
-            <Label>Select a user to login as</Label>
-            <Select name="user">
-              <SelectTrigger>
-                <SelectValue placeholder="Select a user..." />
-              </SelectTrigger>
-              <SelectContent>
-                {DUMMY_USERS.map((user) => (
-                  <SelectItem key={user.uid} value={user.uid}>
-                    {user.displayName} ({user.role})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Select your role to login</Label>
+             <RadioGroup 
+                defaultValue="student"
+                className="flex gap-4 justify-center" 
+                onValueChange={(value) => setDemoRole(value as 'admin' | 'staff' | 'student')}
+              >
+              {uniqueRoles.map((role) => (
+                <div className="flex items-center space-x-2" key={role}>
+                    <RadioGroupItem value={role} id={`role-${role}`} />
+                    <Label className="capitalize" htmlFor={`role-${role}`}>{role}</Label>
+                </div>
+              ))}
+            </RadioGroup>
           </div>
         )}
         <Button type="submit" className="w-full">
