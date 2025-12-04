@@ -1,7 +1,8 @@
+
 'use client';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { addActivity } from '@/app/actions';
 import { Button } from '@/components/ui/button';
@@ -15,17 +16,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { SDG_GOALS } from '@/lib/data';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { UploadCloud } from 'lucide-react';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -40,10 +35,12 @@ export function ActivityForm() {
   const { user } = useAuth();
   const initialState = { message: null, errors: {} };
   
+  // Hooks must be called unconditionally at the top level.
   const addActivityWithStudentId = addActivity.bind(null, user?.uid || '', user?.displayName || 'Student');
   const [state, dispatch] = useActionState(addActivityWithStudentId, initialState);
-
   const { toast } = useToast();
+  const [fileName, setFileName] = useState('');
+
 
   useEffect(() => {
     if (state.type === 'success') {
@@ -51,6 +48,7 @@ export function ActivityForm() {
         title: 'Success!',
         description: state.message,
       });
+      setFileName(''); // Clear file name on successful submission
     } else if (state.type === 'error') {
       toast({
         variant: 'destructive',
@@ -60,6 +58,7 @@ export function ActivityForm() {
     }
   }, [state, toast]);
   
+  // This check must come after all hooks are called.
   if (!user) return null;
 
   return (
@@ -85,14 +84,27 @@ export function ActivityForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="documentationFile">Documentation File</Label>
+            <Label>Documentation File</Label>
+            <Label 
+              htmlFor="documentationFile"
+              className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-primary bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+            >
+              <UploadCloud className="h-8 w-8" />
+              <span className="mt-2 text-sm font-semibold">
+                {fileName ? fileName : 'Click to upload or drag and drop'}
+              </span>
+              <p className="text-xs text-primary/80">PDF, PNG, JPG or other supporting documents</p>
+            </Label>
             <Input
               id="documentationFile"
               name="documentationFile"
               type="file"
+              className="sr-only"
+              onChange={(e) => setFileName(e.target.files?.[0]?.name || '')}
             />
             {state.errors?.documentationFile && <p className="text-sm font-medium text-destructive">{state.errors.documentationFile[0]}</p>}
           </div>
+
 
           <div className="space-y-2">
             <Label>Relevant SDG Goals</Label>
@@ -123,3 +135,4 @@ export function ActivityForm() {
     </form>
   );
 }
+
