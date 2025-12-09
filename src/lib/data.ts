@@ -49,6 +49,14 @@ export const DUMMY_USERS: Omit<UserProfile, keyof import('firebase/auth').User |
     role: 'student',
     department: 'Business',
   },
+  {
+    uid: 'student-04',
+    displayName: 'Maya Patel',
+    email: 'm.patel@campus.edu',
+    photoURL: 'https://i.pravatar.cc/150?u=student-04',
+    role: 'student',
+    department: 'Business',
+  },
 ];
 
 
