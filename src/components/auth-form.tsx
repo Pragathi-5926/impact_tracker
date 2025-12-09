@@ -164,7 +164,7 @@ export function AuthForm() {
               e.preventDefault();
               setIsSignUp(true);
             }}
-            className="underline"
+            className="underline text-primary"
           >
             Sign up
           </a>
