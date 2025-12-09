@@ -16,10 +16,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Eye, EyeOff } from 'lucide-react';
 
 export function AuthForm() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [demoRole, setDemoRole] = useState<'admin' | 'staff' | 'student' | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const { loginAs, loading } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
@@ -97,7 +99,24 @@ export function AuthForm() {
               </a>
             )}
           </div>
-          <Input id="password" type="password" required defaultValue={isSignUp ? '' : 'password'} />
+          <div className="relative">
+            <Input 
+              id="password" 
+              type={showPassword ? 'text' : 'password'} 
+              required 
+              defaultValue={isSignUp ? '' : 'password'} 
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff /> : <Eye />}
+              <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
+            </Button>
+          </div>
         </div>
         {isSignUp && (
             <div className="grid gap-2">
