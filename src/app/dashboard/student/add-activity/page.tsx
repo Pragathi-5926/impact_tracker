@@ -1,3 +1,5 @@
+'use client';
+
 import { ActivityForm } from "@/components/dashboard/student/activity-form";
 
 export default function AddActivityPage() {
