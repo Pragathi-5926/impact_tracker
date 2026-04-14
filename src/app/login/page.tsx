@@ -10,7 +10,7 @@ export default function LoginPage() {
           <div className="grid gap-2 text-center">
             <Logo className="justify-center" />
             <h1 className="text-xl font-bold mt-4 text-primary">Welcome Back</h1>
-            <p className="text-balance text-muted-foreground">
+            <p className="text-balance text-foreground">
               Enter Your Credentials To Access Your Dashboard
             </p>
           </div>
