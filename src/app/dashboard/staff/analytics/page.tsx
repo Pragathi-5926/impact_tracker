@@ -1,6 +1,5 @@
 'use client';
 
-import { SDGBarChart } from "@/components/dashboard/chart-components";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DUMMY_ACTIVITIES, DUMMY_USERS } from "@/lib/data";
@@ -12,20 +11,6 @@ export default function StaffAnalyticsPage() {
 
     const departmentActivities = DUMMY_ACTIVITIES; // Assuming staff sees all activities for now.
 
-    const departmentAnalytics = departmentActivities.reduce((acc, activity) => {
-        if (activity.status === 'approved') {
-            activity.sdgGoals.forEach(goalId => {
-                acc[goalId] = (acc[goalId] || 0) + 1;
-            });
-        }
-        return acc;
-    }, {} as Record<number, number>);
-
-    const chartData = Object.entries(departmentAnalytics).map(([goal, count]) => ({
-        name: `SDG ${goal}`,
-        activities: count
-    }));
-    
     const studentPerformance = DUMMY_USERS
         .filter(u => u.role === 'student')
         .map(student => {
@@ -47,14 +32,6 @@ export default function StaffAnalyticsPage() {
                 <p className="text-muted-foreground">Performance and contribution metrics for the {user.department} department.</p>
             </div>
 
-            <SDGBarChart
-                data={chartData}
-                title="Department SDG Focus"
-                description="Distribution of approved activities across different SDG goals for the whole campus."
-                dataKey="activities"
-                xAxisKey="name"
-            />
-            
             <Card>
                 <CardHeader>
                     <CardTitle>Top Student Performers</CardTitle>
