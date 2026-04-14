@@ -23,7 +23,7 @@ export default function DashboardLayout({
           <div className="relative ml-auto flex-1 md:grow-0" />
           <UserNav />
         </header>
-        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+        <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 [&_h1]:text-primary">
           {children}
         </main>
       </div>

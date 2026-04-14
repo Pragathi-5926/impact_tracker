@@ -9,7 +9,7 @@ export default function LoginPage() {
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
             <Logo className="justify-center" />
-            <h1 className="text-xl font-bold mt-4">Welcome Back</h1>
+            <h1 className="text-xl font-bold mt-4 text-primary">Welcome Back</h1>
             <p className="text-balance text-muted-foreground">
               Enter Your Credentials To Access Your Dashboard
             </p>
@@ -17,7 +17,7 @@ export default function LoginPage() {
           <AuthForm />
         </div>
       </div>
-      <div className="hidden lg:block relative">
+      <div className="hidden lg:block relative bg-white">
         <Image
           src="/login-hero.png"
           alt="People working on a project"
