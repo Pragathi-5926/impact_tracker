@@ -17,7 +17,7 @@ export function Logo({
         className="rounded-lg"
       />
       {showText && (
-        <span className="font-bold text-3xl text-primary">SDG TRACKER</span>
+        <span className="font-bold text-2xl text-primary">SDG TRACKER</span>
       )}
     </div>
   );
