@@ -74,7 +74,7 @@ export function SDGAreaChart({ data, title, description, dataKey, xAxisKey }: SD
  const chartConfig = {
     [dataKey]: {
       label: "Points",
-      color: "hsl(var(--accent))",
+      color: "hsl(var(--primary))",
     },
   } satisfies ChartConfig
 
