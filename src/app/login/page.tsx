@@ -22,7 +22,7 @@ export default function LoginPage() {
           <AuthForm />
         </div>
       </div>
-      <div className="hidden bg-muted lg:block relative">
+      <div className="hidden bg-background lg:block relative">
         {loginImage && (
           <Image
             src={loginImage.imageUrl}
