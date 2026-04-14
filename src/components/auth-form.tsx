@@ -93,7 +93,7 @@ export function AuthForm() {
                   e.preventDefault();
                   setIsSignUp(false);
                 }}
-                className="ml-auto inline-block text-sm underline"
+                className="ml-auto inline-block text-sm underline text-primary"
               >
                 Already have an account?
               </a>
@@ -137,7 +137,6 @@ export function AuthForm() {
           <div className="grid gap-2 text-center my-4">
             <Label className="font-medium text-base capitalize">Select Your Role To Login</Label>
              <RadioGroup 
-                defaultValue="student"
                 className="flex gap-4 justify-center" 
                 onValueChange={(value) => setDemoRole(value as 'admin' | 'staff' | 'student')}
               >
