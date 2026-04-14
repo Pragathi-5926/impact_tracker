@@ -22,13 +22,11 @@ const navItemsByRole: Record<UserRole, { href: string; label: string; icon: any 
   admin: [
     { href: '/dashboard/admin', label: 'Home & Members', icon: Home },
     { href: '/dashboard/admin/reports', label: 'Department Reports', icon: BarChart2 },
-    { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
   ],
   staff: [
     { href: '/dashboard/staff', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/dashboard/staff/verify', label: 'Verify Submissions', icon: CheckSquare },
     { href: '/dashboard/staff/analytics', label: 'Analytics', icon: TrendingUp },
-    { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
   ],
   student: [
     { href: '/dashboard/student', label: 'My Dashboard', icon: LayoutDashboard },
@@ -36,7 +34,6 @@ const navItemsByRole: Record<UserRole, { href: string; label: string; icon: any 
     { href: '/dashboard/student/progress', label: 'My Progress', icon: TrendingUp },
     { href: '/dashboard/student/leaderboard', label: 'Leaderboard', icon: Award },
     { href: '/dashboard/student/reports', label: 'My Reports', icon: FileText },
-    { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
   ],
 };
 
