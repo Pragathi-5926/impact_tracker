@@ -83,7 +83,7 @@ export function AuthForm() {
       <form onSubmit={handleSignIn} className="grid gap-4">
         {isSignUp && (
             <div className="grid gap-2">
-                <Label htmlFor="name" className="text-base">Full Name</Label>
+                <Label htmlFor="name" className="text-base">Name</Label>
                 <Input id="name" required />
             </div>
         )}
