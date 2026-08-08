@@ -119,6 +119,7 @@ export function AuthForm() {
           </div>
         </div>
         {isSignUp && (
+          <>
             <div className="grid gap-2">
                 <Label htmlFor="role-signup" className="text-base">Role</Label>
                 <Select name="role-signup" required>
@@ -132,6 +133,11 @@ export function AuthForm() {
                     </SelectContent>
                 </Select>
             </div>
+            <div className="grid gap-2">
+                <Label htmlFor="department" className="text-base">Department</Label>
+                <Input id="department" placeholder="e.g. Computer Science" required />
+            </div>
+          </>
         )}
         {!isSignUp && (
           <div className="grid gap-2 text-center my-4">
