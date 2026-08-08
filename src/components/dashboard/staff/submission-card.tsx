@@ -297,7 +297,7 @@ export function SubmissionCard({ activity, onUpdate }: { activity: Activity; onU
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-primary flex items-center gap-2">
                 <Check className="h-4 w-4" />
-                Evaluation Result {!activity.evaluation && "(Temporary Mock)"}
+                Evaluation Result
               </h4>
               <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary font-bold">
                 Total: {displayEvaluation.totalScore} / 25
@@ -337,7 +337,7 @@ export function SubmissionCard({ activity, onUpdate }: { activity: Activity; onU
           <div className="rounded-md border border-destructive/20 bg-destructive/5 p-4 space-y-2">
             <h4 className="font-bold text-destructive flex items-center gap-2">
               <AlertCircle className="h-4 w-4" />
-              Rejection Details {!activity.rejection && "(Temporary Mock)"}
+              Rejection Details
             </h4>
             <p className="text-sm text-muted-foreground">
               <span className="font-semibold text-foreground">Reason:</span> {displayRejection.reason}
