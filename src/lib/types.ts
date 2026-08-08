@@ -14,7 +14,7 @@ export interface Activity {
   description: string;
   sdgGoals: number[];
   documentationLinks: string[];
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'verified' | 'rejected';
   submittedAt: {
     seconds: number;
     nanoseconds: number;

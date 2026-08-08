@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { db } from './lib/firebase/config';
-import { collection, addDoc, serverTimestamp, updateDoc, doc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
 
 const addMemberSchema = z.object({
   email: z.string().email(),
@@ -22,6 +22,7 @@ export async function addMember(prevState: any, formData: FormData) {
         errors: validatedFields.error.flatten().fieldErrors,
       };
     }
+    // In a real app, you'd create a user in Firebase Auth and a profile in Firestore here.
     console.log('Adding new member (mock):', validatedFields.data);
     revalidatePath('/dashboard/admin');
     return { type: "success", message: `Successfully added ${validatedFields.data.name}.` };
@@ -52,21 +53,24 @@ export async function addActivity(studentId: string, studentName: string, prevSt
       };
     }
 
-    const { description, documentationFile, sdgGoals } = validatedFields.data;
-    const documentationLinks = documentationFile?.name ? [`/uploads/${documentationFile.name}`] : [];
+    const { description, sdgGoals } = validatedFields.data;
+    // Note: File upload to storage would happen here in a real app.
+    // For now, we simulate a link if a file name was provided.
+    const documentationLinks = formData.get('documentationFile') ? ['/mock-upload/evidence.pdf'] : [];
 
-    console.log('Adding new activity (mock):', { 
-      studentId, 
+    await addDoc(collection(db, 'activities'), {
+      studentId,
       studentName,
       description,
-      documentationLinks: documentationLinks,
+      documentationLinks,
       sdgGoals: sdgGoals.map(Number),
       status: 'pending',
-      submittedAt: new Date(),
+      submittedAt: serverTimestamp(),
       points: 0,
-     });
-    
+    });
+
     revalidatePath('/dashboard/student');
+    revalidatePath('/dashboard/staff/verify');
     return { type: "success", message: 'Activity submitted successfully!' };
 
   } catch (e) {
@@ -77,15 +81,20 @@ export async function addActivity(studentId: string, studentName: string, prevSt
 
 export async function approveAndEvaluateActivity(activityId: string, staffId: string, evaluation: any) {
   try {
-    console.log(`Approving and evaluating activity ${activityId} (mock):`, {
-      evaluation,
-      status: 'approved',
+    const activityRef = doc(db, 'activities', activityId);
+    await updateDoc(activityRef, {
+      status: 'verified',
+      points: evaluation.totalScore,
+      evaluation: {
+        ...evaluation,
+        evaluatedAt: new Date(),
+      },
       verifiedBy: staffId,
       verifiedAt: new Date(),
-      points: evaluation.totalScore
     });
-    // Mock database update
+
     revalidatePath('/dashboard/staff/verify');
+    revalidatePath('/dashboard/student');
     return { type: "success", message: 'Activity approved and evaluated successfully.' };
   } catch (e) {
     console.error(e);
@@ -95,28 +104,23 @@ export async function approveAndEvaluateActivity(activityId: string, staffId: st
 
 export async function rejectActivityWithReason(activityId: string, staffId: string, rejection: any) {
   try {
-    console.log(`Rejecting activity ${activityId} (mock):`, {
-      rejection,
+    const activityRef = doc(db, 'activities', activityId);
+    await updateDoc(activityRef, {
       status: 'rejected',
+      rejection: {
+        ...rejection,
+        rejectedAt: new Date(),
+      },
       verifiedBy: staffId,
-      verifiedAt: new Date()
+      verifiedAt: new Date(),
+      points: 0,
     });
-    // Mock database update
+
     revalidatePath('/dashboard/staff/verify');
+    revalidatePath('/dashboard/student');
     return { type: "success", message: 'Activity rejected successfully.' };
   } catch (e) {
     console.error(e);
     return { type: "error", message: 'Database Error: Failed to reject submission.' };
   }
-}
-
-export async function updateActivityStatus(activityId: string, status: 'approved' | 'rejected', feedback?: string) {
-    try {
-        console.log(`Updating activity ${activityId} to ${status} (legacy mock)`);
-        revalidatePath('/dashboard/staff/verify');
-        return { type: "success", message: `Submission ${status}.` };
-    } catch (e) {
-        console.error(e);
-        return { type: "error", message: 'Database Error: Failed to update submission.' };
-    }
 }

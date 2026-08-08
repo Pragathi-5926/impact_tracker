@@ -37,16 +37,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, format } from 'date-fns';
 import {
   Link as LinkIcon,
   Check,
   X,
+  FileText,
+  AlertCircle
 } from 'lucide-react';
 import { SDG_GOALS } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
 import { approveAndEvaluateActivity, rejectActivityWithReason } from '@/app/actions';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { Separator } from '@/components/ui/separator';
 
 export function SubmissionCard({ activity }: { activity: Activity }) {
   const { user } = useAuth();
@@ -89,7 +92,6 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
       totalScore,
       staffFeedback,
       evaluatedBy: user.uid,
-      evaluatedAt: new Date(),
     };
 
     const result = await approveAndEvaluateActivity(activity.id, user.uid, evaluationData);
@@ -118,7 +120,6 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
     const rejectionData = {
       reason: rejectionReason,
       rejectedBy: user.uid,
-      rejectedAt: new Date(),
     };
 
     const result = await rejectActivityWithReason(activity.id, user.uid, rejectionData);
@@ -132,6 +133,7 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
   };
 
   const getInitials = (name: string) => {
+    if (!name) return 'U';
     const names = name.split(' ');
     return names.length > 1
       ? `${names[0][0]}${names[names.length - 1][0]}`
@@ -146,28 +148,31 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
     { id: 'activityDescription', label: 'Activity Description', description: 'How clearly the student explains what they did and how it connects to the SDG.' },
   ];
 
+  const submittedDate = activity.submittedAt instanceof Date 
+    ? activity.submittedAt 
+    : activity.submittedAt ? new Date(activity.submittedAt.seconds * 1000) : new Date();
+
   return (
     <Card>
       <CardHeader>
         <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-lg">
+          <div className="space-y-1">
+            <CardTitle className="text-lg leading-tight">
               {activity.description}
             </CardTitle>
-            <CardDescription className="flex items-center gap-2 pt-2">
+            <CardDescription className="flex items-center gap-2 pt-1">
               <Avatar className="h-6 w-6">
-                <AvatarImage src="" />
-                <AvatarFallback>{getInitials(activity.studentName)}</AvatarFallback>
+                <AvatarFallback className="text-[10px]">{getInitials(activity.studentName)}</AvatarFallback>
               </Avatar>
-              {activity.studentName} &middot; Submitted{' '}
-              {formatDistanceToNow(new Date(activity.submittedAt as Date), { addSuffix: true })}
+              <span className="font-medium">{activity.studentName}</span> &middot; 
+              <span>Submitted {formatDistanceToNow(submittedDate, { addSuffix: true })}</span>
             </CardDescription>
           </div>
-          <div className="flex flex-wrap gap-1 justify-end">
+          <div className="flex flex-wrap gap-1 justify-end max-w-[200px]">
             {activity.sdgGoals.map((id) => {
                 const goal = SDG_GOALS.find(g => g.id === id);
                 return (
-                    <Badge key={id} variant="secondary" style={goal ? {backgroundColor: `${goal.color}20`} : {}}>
+                    <Badge key={id} variant="secondary" className="text-[10px]" style={goal ? {backgroundColor: `${goal.color}20`, color: goal.color, border: `1px solid ${goal.color}40`} : {}}>
                         SDG {id}
                     </Badge>
                 )
@@ -175,39 +180,102 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <Accordion type="single" collapsible>
-          <AccordionItem value="documentation">
-            <AccordionTrigger>View Documentation</AccordionTrigger>
-            <AccordionContent className="space-y-4">
-              <div>
-                <h4 className="font-semibold mb-2">Provided Links:</h4>
-                <ul className="space-y-1 list-disc pl-5">
-                  {activity.documentationLinks.map((link, i) => (
+      <CardContent className="space-y-4">
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="documentation" className="border-none">
+            <AccordionTrigger className="py-2 hover:no-underline text-sm font-medium">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                View Supporting Evidence
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="pt-2 pb-0">
+              <div className="rounded-md bg-muted/50 p-3">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Documentation Links:</h4>
+                <ul className="space-y-1.5">
+                  {activity.documentationLinks.length > 0 ? activity.documentationLinks.map((link, i) => (
                     <li key={i}>
                       <a
                         href={link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary underline hover:no-underline flex items-center gap-1"
+                        className="text-xs text-primary underline hover:no-underline flex items-center gap-1.5"
                       >
                         <LinkIcon className="h-3 w-3" />
                         {link}
                       </a>
                     </li>
-                  ))}
+                  )) : (
+                    <li className="text-xs text-muted-foreground italic">No links provided.</li>
+                  )}
                 </ul>
               </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
+        {activity.status === 'verified' && activity.evaluation && (
+          <div className="rounded-md border border-accent bg-accent/5 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-primary flex items-center gap-2">
+                <Check className="h-4 w-4" />
+                Evaluation Result
+              </h4>
+              <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary font-bold">
+                Total: {activity.evaluation.totalScore} / 25
+              </Badge>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
+               <div className="flex justify-between border-b pb-1">
+                 <span className="text-muted-foreground">SDG Alignment:</span>
+                 <span className="font-medium">{activity.evaluation.sdgAlignment}/5</span>
+               </div>
+               <div className="flex justify-between border-b pb-1">
+                 <span className="text-muted-foreground">Participation:</span>
+                 <span className="font-medium">{activity.evaluation.participationContribution}/5</span>
+               </div>
+               <div className="flex justify-between border-b pb-1">
+                 <span className="text-muted-foreground">Significance:</span>
+                 <span className="font-medium">{activity.evaluation.activitySignificanceImpact}/5</span>
+               </div>
+               <div className="flex justify-between border-b pb-1">
+                 <span className="text-muted-foreground">Documentation:</span>
+                 <span className="font-medium">{activity.evaluation.proofDocumentation}/5</span>
+               </div>
+               <div className="flex justify-between border-b pb-1">
+                 <span className="text-muted-foreground">Description:</span>
+                 <span className="font-medium">{activity.evaluation.activityDescription}/5</span>
+               </div>
+            </div>
+            {activity.evaluation.staffFeedback && (
+              <div className="mt-2 text-sm italic text-muted-foreground border-l-2 border-primary/20 pl-3 py-1">
+                "{activity.evaluation.staffFeedback}"
+              </div>
+            )}
+          </div>
+        )}
+
+        {activity.status === 'rejected' && activity.rejection && (
+          <div className="rounded-md border border-destructive/20 bg-destructive/5 p-4 space-y-2">
+            <h4 className="font-bold text-destructive flex items-center gap-2">
+              <AlertCircle className="h-4 w-4" />
+              Rejection Details
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              <span className="font-semibold text-foreground">Reason:</span> {activity.rejection.reason}
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              Rejected on {format(activity.rejection.rejectedAt instanceof Date ? activity.rejection.rejectedAt : new Date(activity.rejection.rejectedAt.seconds * 1000), 'PPP')}
+            </p>
+          </div>
+        )}
       </CardContent>
+
       {activity.status === 'pending' && (
-        <CardFooter className="flex justify-end gap-2">
-          {/* Rejection Dialog */}
+        <CardFooter className="flex justify-end gap-2 border-t pt-4">
           <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="h-8 border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground">
                 <X className="mr-2 h-4 w-4" /> Reject
               </Button>
             </DialogTrigger>
@@ -239,10 +307,9 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
             </DialogContent>
           </Dialog>
 
-          {/* Evaluation Dialog */}
           <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-accent hover:bg-accent/90 text-accent-foreground" size="sm">
+              <Button className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground" size="sm">
                 <Check className="mr-2 h-4 w-4" /> Approve
               </Button>
             </DialogTrigger>
@@ -278,8 +345,11 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
                   </div>
                 ))}
 
-                <div className="pt-4 border-t flex items-center justify-between">
-                  <span className="font-bold text-lg text-primary">Total Score: {totalScore} / 25</span>
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-lg text-primary">Total Score:</span>
+                  <span className="font-bold text-2xl text-primary">{totalScore} / 25</span>
                 </div>
 
                 <div className="space-y-2">
@@ -296,7 +366,7 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsApproveOpen(false)}>Cancel</Button>
                 <Button 
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   onClick={handleApprove}
                   disabled={isSubmitting}
                 >
@@ -307,9 +377,13 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
           </Dialog>
         </CardFooter>
       )}
+
       {activity.status !== 'pending' && (
-        <CardFooter className="flex justify-end items-center">
-            <Badge variant={activity.status === 'approved' ? 'outline' : 'destructive'} className="capitalize">
+        <CardFooter className="flex justify-end items-center border-t pt-2 mt-2 bg-muted/20">
+            <span className="text-[10px] text-muted-foreground italic mr-auto">
+              {activity.status === 'verified' ? 'Approved' : 'Rejected'} by {activity.verifiedBy === user?.uid ? 'You' : 'Staff'}
+            </span>
+            <Badge variant={activity.status === 'verified' ? 'default' : 'destructive'} className="capitalize h-5 text-[10px] px-2">
                 {activity.status}
             </Badge>
         </CardFooter>

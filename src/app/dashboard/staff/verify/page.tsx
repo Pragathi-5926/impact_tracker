@@ -1,12 +1,34 @@
 'use client';
+
+import { useState, useEffect } from 'react';
+import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase/config';
 import { SubmissionCard } from "@/components/dashboard/staff/submission-card";
-import { DUMMY_ACTIVITIES } from "@/lib/data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import type { Activity } from '@/lib/types';
 
 export default function VerifySubmissionsPage() {
-    const pendingActivities = DUMMY_ACTIVITIES.filter(a => a.status === 'pending');
-    const verifiedActivities = DUMMY_ACTIVITIES.filter(a => a.status !== 'pending').sort((a,b) => new Date(b.verifiedAt || 0).getTime() - new Date(a.verifiedAt || 0).getTime());
+    const [activities, setActivities] = useState<Activity[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const q = query(collection(db, 'activities'), orderBy('submittedAt', 'desc'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const activitiesData = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            })) as Activity[];
+            setActivities(activitiesData);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    const pendingActivities = activities.filter(a => a.status === 'pending');
+    const verifiedActivities = activities.filter(a => a.status === 'verified');
+    const rejectedActivities = activities.filter(a => a.status === 'rejected');
 
     return (
         <div className="container mx-auto p-4 md:p-6">
@@ -16,16 +38,26 @@ export default function VerifySubmissionsPage() {
             </div>
             
             <Tabs defaultValue="pending">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="pending">
                         Pending
                         <Badge variant="secondary" className="ml-2">{pendingActivities.length}</Badge>
                     </TabsTrigger>
-                    <TabsTrigger value="verified">Verified</TabsTrigger>
+                    <TabsTrigger value="verified">
+                        Verified
+                        <Badge variant="secondary" className="ml-2">{verifiedActivities.length}</Badge>
+                    </TabsTrigger>
+                    <TabsTrigger value="rejected">
+                        Rejected
+                        <Badge variant="secondary" className="ml-2">{rejectedActivities.length}</Badge>
+                    </TabsTrigger>
                 </TabsList>
+                
                 <TabsContent value="pending" className="mt-6">
                     <div className="space-y-4">
-                        {pendingActivities.length > 0 ? (
+                        {loading ? (
+                            <p className="text-center py-10">Loading submissions...</p>
+                        ) : pendingActivities.length > 0 ? (
                             pendingActivities.map(activity => (
                                 <SubmissionCard key={activity.id} activity={activity} />
                             ))
@@ -34,6 +66,7 @@ export default function VerifySubmissionsPage() {
                         )}
                     </div>
                 </TabsContent>
+                
                 <TabsContent value="verified" className="mt-6">
                     <div className="space-y-4">
                          {verifiedActivities.length > 0 ? (
@@ -42,6 +75,18 @@ export default function VerifySubmissionsPage() {
                             ))
                         ) : (
                             <p className="text-muted-foreground text-center py-10">No submissions have been verified yet.</p>
+                        )}
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="rejected" className="mt-6">
+                    <div className="space-y-4">
+                         {rejectedActivities.length > 0 ? (
+                            rejectedActivities.map(activity => (
+                                <SubmissionCard key={activity.id} activity={activity} />
+                            ))
+                        ) : (
+                            <p className="text-muted-foreground text-center py-10">No submissions have been rejected yet.</p>
                         )}
                     </div>
                 </TabsContent>
