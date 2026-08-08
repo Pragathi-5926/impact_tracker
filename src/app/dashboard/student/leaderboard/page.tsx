@@ -11,17 +11,40 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { DUMMY_ACTIVITIES, DUMMY_USERS } from '@/lib/data';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Award, Star } from 'lucide-react';
+import { Award } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { collection, onSnapshot, query } from 'firebase/firestore';
+import { db } from '@/lib/firebase/config';
+import type { Activity } from '@/lib/types';
 
 export default function LeaderboardPage() {
   const { user } = useAuth();
+  const [activities, setActivities] = useState<Activity[]>(DUMMY_ACTIVITIES as Activity[]);
+
+  useEffect(() => {
+    const q = query(collection(db, 'activities'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const firestoreActs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Activity[];
+      setActivities(prev => {
+        const dummyOnly = prev.filter(a => a.id.startsWith('act-'));
+        const merged = [...firestoreActs];
+        dummyOnly.forEach(dummy => {
+          if (!merged.find(m => m.id === dummy.id)) {
+            merged.push(dummy);
+          }
+        });
+        return merged;
+      });
+    });
+    return () => unsubscribe();
+  }, []);
 
   const studentPoints = DUMMY_USERS
     .filter(u => u.role === 'student')
     .map(student => {
-        const points = DUMMY_ACTIVITIES
-            .filter(act => act.studentId === student.uid && act.status === 'approved')
-            .reduce((sum, act) => sum + act.points, 0);
+        const points = activities
+            .filter(act => act.studentId === student.uid && (act.status === 'approved' || act.status === 'verified'))
+            .reduce((sum, act) => sum + (act.points || 0), 0);
         return {
             uid: student.uid,
             name: student.displayName,
@@ -51,13 +74,13 @@ export default function LeaderboardPage() {
     <div className="container mx-auto p-4 md:p-6">
        <div className="space-y-2 mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Leaderboard</h1>
-        <p className="text-muted-foreground">See who is making the biggest impact.</p>
+        <p className="text-muted-foreground">See who is making the biggest impact on SDG goals.</p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Top Student Contributors</CardTitle>
-          <CardDescription>Rankings are based on total points from verified activities.</CardDescription>
+          <CardDescription>Rankings are based on total points from verified and approved activities.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>

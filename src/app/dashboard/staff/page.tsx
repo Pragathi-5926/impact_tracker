@@ -7,18 +7,41 @@ import { DUMMY_ACTIVITIES } from '@/lib/data';
 import { SDGBarChart } from '@/components/dashboard/chart-components';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+import { collection, onSnapshot, query } from 'firebase/firestore';
+import { db } from '@/lib/firebase/config';
+import type { Activity } from '@/lib/types';
 
 export default function StaffDashboard() {
   const { user } = useAuth();
+  const [activities, setActivities] = useState<Activity[]>(DUMMY_ACTIVITIES as Activity[]);
+  
+  useEffect(() => {
+    const q = query(collection(db, 'activities'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const firestoreActs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Activity[];
+      setActivities(prev => {
+        const dummyOnly = prev.filter(a => a.id.startsWith('act-'));
+        const merged = [...firestoreActs];
+        dummyOnly.forEach(dummy => {
+          if (!merged.find(m => m.id === dummy.id)) {
+            merged.push(dummy);
+          }
+        });
+        return merged;
+      });
+    });
+    return () => unsubscribe();
+  }, []);
   
   if (!user) return null;
 
-  const pendingCount = DUMMY_ACTIVITIES.filter(a => a.status === 'pending').length;
-  const approvedCount = DUMMY_ACTIVITIES.filter(a => a.status === 'approved').length;
-  const rejectedCount = DUMMY_ACTIVITIES.filter(a => a.status === 'rejected').length;
+  const pendingCount = activities.filter(a => a.status === 'pending').length;
+  const approvedCount = activities.filter(a => a.status === 'approved' || a.status === 'verified').length;
+  const rejectedCount = activities.filter(a => a.status === 'rejected').length;
 
-  const departmentAnalytics = DUMMY_ACTIVITIES.reduce((acc, activity) => {
-    if(activity.status === 'approved') {
+  const departmentAnalytics = activities.reduce((acc, activity) => {
+    if(activity.status === 'approved' || activity.status === 'verified') {
         activity.sdgGoals.forEach(goalId => {
             acc[goalId] = (acc[goalId] || 0) + 1;
         });
@@ -46,9 +69,9 @@ export default function StaffDashboard() {
       
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <StatCard title="Pending Verifications" value={pendingCount} icon={Hourglass} description="Submissions awaiting review" />
-        <StatCard title="Total Approved" value={approvedCount} icon={CheckCircle2} description="Since the start of term" />
+        <StatCard title="Total Approved" value={approvedCount} icon={CheckCircle2} description="Verified & Approved" />
         <StatCard title="Total Rejected" value={rejectedCount} icon={XCircle} description="Since the start of term" />
-        <StatCard title="Overall Activity" value={DUMMY_ACTIVITIES.length} icon={BarChart2} description="Total submissions received" />
+        <StatCard title="Overall Activity" value={activities.length} icon={BarChart2} description="Total submissions received" />
       </div>
 
       <SDGBarChart 

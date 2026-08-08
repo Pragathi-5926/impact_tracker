@@ -20,16 +20,20 @@ export default function VerifySubmissionsPage() {
           ...doc.data()
         })) as Activity[];
         
-        // Merge dummy activities with firestore activities
-        // In a real app, you'd only use firestoreActivities
         setActivities(prev => {
-          const dummyOnly = prev.filter(a => a.id.startsWith('act-'));
+          // Identify dummy activities that haven't been "overridden" by a real Firestore update locally
+          // We keep track of locally updated dummy IDs to prevent them reverting
           const merged = [...firestoreActivities];
           
-          // Only add dummy activities that don't have a newer version in firestore (if we used real IDs)
+          // Re-add dummy activities but check if they were updated locally
+          const dummyOnly = DUMMY_ACTIVITIES.map(d => {
+            const locallyUpdated = prev.find(p => p.id === d.id);
+            return locallyUpdated || d;
+          });
+
           dummyOnly.forEach(dummy => {
             if (!merged.find(m => m.id === dummy.id)) {
-              merged.push(dummy);
+              merged.push(dummy as Activity);
             }
           });
           
@@ -47,7 +51,7 @@ export default function VerifySubmissionsPage() {
     };
 
     const pendingActivities = activities.filter(a => a.status === 'pending');
-    const verifiedActivities = activities.filter(a => a.status === 'verified');
+    const verifiedActivities = activities.filter(a => a.status === 'verified' || a.status === 'approved');
     const rejectedActivities = activities.filter(a => a.status === 'rejected');
 
     return (
