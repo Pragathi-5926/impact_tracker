@@ -135,7 +135,7 @@ export function AuthForm() {
             </div>
             <div className="grid gap-2">
                 <Label htmlFor="department" className="text-base">Department</Label>
-                <Input id="department" placeholder="e.g. Computer Science" required />
+                <Input id="department" required />
             </div>
           </>
         )}
