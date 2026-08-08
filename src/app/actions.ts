@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { db } from './lib/firebase/config';
+import { db } from '@/lib/firebase/config';
 import { collection, addDoc, serverTimestamp, updateDoc, doc } from 'firebase/firestore';
 
 const addMemberSchema = z.object({
