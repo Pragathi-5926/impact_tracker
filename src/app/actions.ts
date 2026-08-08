@@ -22,7 +22,6 @@ export async function addMember(prevState: any, formData: FormData) {
         errors: validatedFields.error.flatten().fieldErrors,
       };
     }
-    // In a real app, you'd create a user in Firebase Auth and a profile in Firestore here.
     console.log('Adding new member (mock):', validatedFields.data);
     revalidatePath('/dashboard/admin');
     return { type: "success", message: `Successfully added ${validatedFields.data.name}.` };
@@ -54,8 +53,6 @@ export async function addActivity(studentId: string, studentName: string, prevSt
     }
 
     const { description, sdgGoals } = validatedFields.data;
-    // Note: File upload to storage would happen here in a real app.
-    // For now, we simulate a link if a file name was provided.
     const documentationLinks = formData.get('documentationFile') ? ['/mock-upload/evidence.pdf'] : [];
 
     await addDoc(collection(db, 'activities'), {

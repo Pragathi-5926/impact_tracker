@@ -1,30 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { db } from '@/lib/firebase/config';
 import { SubmissionCard } from "@/components/dashboard/staff/submission-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { DUMMY_ACTIVITIES } from '@/lib/data';
 import type { Activity } from '@/lib/types';
 
 export default function VerifySubmissionsPage() {
-    const [activities, setActivities] = useState<Activity[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const q = query(collection(db, 'activities'), orderBy('submittedAt', 'desc'));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const activitiesData = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Activity[];
-            setActivities(activitiesData);
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, []);
+    const activities = DUMMY_ACTIVITIES as Activity[];
 
     const pendingActivities = activities.filter(a => a.status === 'pending');
     const verifiedActivities = activities.filter(a => a.status === 'verified');
@@ -55,9 +38,7 @@ export default function VerifySubmissionsPage() {
                 
                 <TabsContent value="pending" className="mt-6">
                     <div className="space-y-4">
-                        {loading ? (
-                            <p className="text-center py-10">Loading submissions...</p>
-                        ) : pendingActivities.length > 0 ? (
+                        {pendingActivities.length > 0 ? (
                             pendingActivities.map(activity => (
                                 <SubmissionCard key={activity.id} activity={activity} />
                             ))
