@@ -22,13 +22,7 @@ export async function addMember(prevState: any, formData: FormData) {
         errors: validatedFields.error.flatten().fieldErrors,
       };
     }
-    // In a real app, you would use Firebase Admin SDK to create a user.
-    // Here we just log it for the demo.
     console.log('Adding new member (mock):', validatedFields.data);
-    
-    // Pretend to add to a 'users' collection.
-    // await addDoc(collection(db, 'users'), { ...validatedFields.data, createdAt: serverTimestamp() });
-
     revalidatePath('/dashboard/admin');
     return { type: "success", message: `Successfully added ${validatedFields.data.name}.` };
   } catch (e: any) {
@@ -38,7 +32,7 @@ export async function addMember(prevState: any, formData: FormData) {
 
 const addActivitySchema = z.object({
   description: z.string().min(10, 'Description must be at least 10 characters.'),
-  documentationFile: z.any().optional(), // We'll mock file handling
+  documentationFile: z.any().optional(),
   sdgGoals: z.preprocess((val) => (Array.isArray(val) ? val : [val]), z.array(z.string())),
 });
 
@@ -59,9 +53,6 @@ export async function addActivity(studentId: string, studentName: string, prevSt
     }
 
     const { description, documentationFile, sdgGoals } = validatedFields.data;
-    
-    // In a real app, you would upload the file to storage and get a URL.
-    // For this demo, we'll just log the file name if it exists.
     const documentationLinks = documentationFile?.name ? [`/uploads/${documentationFile.name}`] : [];
 
     console.log('Adding new activity (mock):', { 
@@ -74,16 +65,6 @@ export async function addActivity(studentId: string, studentName: string, prevSt
       submittedAt: new Date(),
       points: 0,
      });
-    // await addDoc(collection(db, 'activities'), {
-    //   studentId,
-    //   studentName,
-    //   description,
-    //   documentationLinks,
-    //   sdgGoals: sdgGoals.map(Number),
-    //   status: 'pending',
-    //   submittedAt: serverTimestamp(),
-    //   points: 0,
-    // });
     
     revalidatePath('/dashboard/student');
     return { type: "success", message: 'Activity submitted successfully!' };
@@ -94,16 +75,44 @@ export async function addActivity(studentId: string, studentName: string, prevSt
   }
 }
 
+export async function approveAndEvaluateActivity(activityId: string, staffId: string, evaluation: any) {
+  try {
+    console.log(`Approving and evaluating activity ${activityId} (mock):`, {
+      evaluation,
+      status: 'approved',
+      verifiedBy: staffId,
+      verifiedAt: new Date(),
+      points: evaluation.totalScore
+    });
+    // Mock database update
+    revalidatePath('/dashboard/staff/verify');
+    return { type: "success", message: 'Activity approved and evaluated successfully.' };
+  } catch (e) {
+    console.error(e);
+    return { type: "error", message: 'Database Error: Failed to evaluate submission.' };
+  }
+}
+
+export async function rejectActivityWithReason(activityId: string, staffId: string, rejection: any) {
+  try {
+    console.log(`Rejecting activity ${activityId} (mock):`, {
+      rejection,
+      status: 'rejected',
+      verifiedBy: staffId,
+      verifiedAt: new Date()
+    });
+    // Mock database update
+    revalidatePath('/dashboard/staff/verify');
+    return { type: "success", message: 'Activity rejected successfully.' };
+  } catch (e) {
+    console.error(e);
+    return { type: "error", message: 'Database Error: Failed to reject submission.' };
+  }
+}
+
 export async function updateActivityStatus(activityId: string, status: 'approved' | 'rejected', feedback?: string) {
     try {
-        console.log(`Updating activity ${activityId} to ${status} (mock)`);
-        // const activityRef = doc(db, "activities", activityId);
-        // await updateDoc(activityRef, {
-        //     status,
-        //     feedback: feedback || '',
-        //     verifiedAt: serverTimestamp(),
-        //     points: status === 'approved' ? 20 : 0, // Example points
-        // });
+        console.log(`Updating activity ${activityId} to ${status} (legacy mock)`);
         revalidatePath('/dashboard/staff/verify');
         return { type: "success", message: `Submission ${status}.` };
     } catch (e) {

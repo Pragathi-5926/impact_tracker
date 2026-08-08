@@ -23,4 +23,20 @@ export interface Activity {
   verifiedAt?: Date;
   feedback?: string;
   points: number;
+  evaluation?: {
+    sdgAlignment: number;
+    participationContribution: number;
+    activitySignificanceImpact: number;
+    proofDocumentation: number;
+    activityDescription: number;
+    totalScore: number;
+    staffFeedback?: string;
+    evaluatedBy: string;
+    evaluatedAt: Date;
+  };
+  rejection?: {
+    reason: string;
+    rejectedBy: string;
+    rejectedAt: Date;
+  };
 }
