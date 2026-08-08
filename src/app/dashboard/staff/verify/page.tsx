@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -21,19 +22,16 @@ export default function VerifySubmissionsPage() {
         })) as Activity[];
         
         setActivities(prev => {
-          // Identify dummy activities that haven't been "overridden" by a real Firestore update locally
-          // We keep track of locally updated dummy IDs to prevent them reverting
+          // Start with real activities from Firestore
           const merged = [...firestoreActivities];
           
-          // Re-add dummy activities but check if they were updated locally
-          const dummyOnly = DUMMY_ACTIVITIES.map(d => {
-            const locallyUpdated = prev.find(p => p.id === d.id);
-            return locallyUpdated || d;
-          });
-
-          dummyOnly.forEach(dummy => {
-            if (!merged.find(m => m.id === dummy.id)) {
-              merged.push(dummy as Activity);
+          // Add dummy activities, prioritizing any local updates (approved/rejected) 
+          // stored in the previous state.
+          DUMMY_ACTIVITIES.forEach(dummy => {
+            const firestoreExists = firestoreActivities.find(f => f.id === dummy.id);
+            if (!firestoreExists) {
+              const localUpdate = prev.find(p => p.id === dummy.id);
+              merged.push((localUpdate || dummy) as Activity);
             }
           });
           

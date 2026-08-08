@@ -1,3 +1,4 @@
+
 'use client';
 import {
   Table,
@@ -26,12 +27,11 @@ export default function LeaderboardPage() {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const firestoreActs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Activity[];
       setActivities(prev => {
-        const dummyOnly = prev.filter(a => a.id.startsWith('act-'));
         const merged = [...firestoreActs];
-        dummyOnly.forEach(dummy => {
-          if (!merged.find(m => m.id === dummy.id)) {
-            merged.push(dummy);
-          }
+        DUMMY_ACTIVITIES.forEach(dummy => {
+            if (!merged.find(m => m.id === dummy.id)) {
+                merged.push(dummy as Activity);
+            }
         });
         return merged;
       });
