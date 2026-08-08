@@ -210,6 +210,7 @@ export function SubmissionCard({ activity, onUpdate }: { activity: Activity; onU
     : (activity.submittedAt as any)?.seconds ? new Date((activity.submittedAt as any).seconds * 1000) : new Date();
 
   const isVerified = activity.status === 'verified' || activity.status === 'approved';
+  const isRejected = activity.status === 'rejected';
 
   // Dummy evaluation for testing if it doesn't exist on a verified activity
   const displayEvaluation = activity.evaluation || (isVerified ? {
@@ -220,6 +221,13 @@ export function SubmissionCard({ activity, onUpdate }: { activity: Activity; onU
     activityDescription: 4,
     totalScore: 21,
     staffFeedback: "Good participation with relevant SDG connection and supporting evidence."
+  } : null);
+
+  // Dummy rejection for testing if it doesn't exist on a rejected activity
+  const displayRejection = activity.rejection || (isRejected ? {
+    reason: "The documentation link provided is inaccessible or invalid. Please ensure the link is public and provides clear evidence of the activity.",
+    rejectedBy: "staff-01",
+    rejectedAt: activity.verifiedAt || new Date(),
   } : null);
 
   return (
@@ -325,17 +333,17 @@ export function SubmissionCard({ activity, onUpdate }: { activity: Activity; onU
           </div>
         )}
 
-        {activity.status === 'rejected' && activity.rejection && (
+        {isRejected && displayRejection && (
           <div className="rounded-md border border-destructive/20 bg-destructive/5 p-4 space-y-2">
             <h4 className="font-bold text-destructive flex items-center gap-2">
               <AlertCircle className="h-4 w-4" />
-              Rejection Details
+              Rejection Details {!activity.rejection && "(Temporary Mock)"}
             </h4>
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Reason:</span> {activity.rejection.reason}
+              <span className="font-semibold text-foreground">Reason:</span> {displayRejection.reason}
             </p>
             <p className="text-xs text-muted-foreground mt-2">
-              Rejected on {format(activity.rejection.rejectedAt instanceof Date ? activity.rejection.rejectedAt : new Date((activity.rejection.rejectedAt as any).seconds * 1000), 'PPP')}
+              Rejected on {format(displayRejection.rejectedAt instanceof Date ? displayRejection.rejectedAt : new Date((displayRejection.rejectedAt as any).seconds * 1000), 'PPP')}
             </p>
           </div>
         )}
