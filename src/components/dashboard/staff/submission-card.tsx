@@ -209,6 +209,19 @@ export function SubmissionCard({ activity, onUpdate }: { activity: Activity; onU
     ? activity.submittedAt 
     : (activity.submittedAt as any)?.seconds ? new Date((activity.submittedAt as any).seconds * 1000) : new Date();
 
+  const isVerified = activity.status === 'verified' || activity.status === 'approved';
+
+  // Dummy evaluation for testing if it doesn't exist on a verified activity
+  const displayEvaluation = activity.evaluation || (isVerified ? {
+    sdgAlignment: 4,
+    participationContribution: 4,
+    activitySignificanceImpact: 4,
+    proofDocumentation: 5,
+    activityDescription: 4,
+    totalScore: 21,
+    staffFeedback: "Good participation with relevant SDG connection and supporting evidence."
+  } : null);
+
   return (
     <Card>
       <CardHeader>
@@ -271,42 +284,42 @@ export function SubmissionCard({ activity, onUpdate }: { activity: Activity; onU
           </AccordionItem>
         </Accordion>
 
-        {activity.status === 'verified' && activity.evaluation && (
+        {isVerified && displayEvaluation && (
           <div className="rounded-md border border-accent bg-accent/5 p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-primary flex items-center gap-2">
                 <Check className="h-4 w-4" />
-                Evaluation Result
+                Evaluation Result {!activity.evaluation && "(Temporary Mock)"}
               </h4>
               <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary font-bold">
-                Total: {activity.evaluation.totalScore} / 25
+                Total: {displayEvaluation.totalScore} / 25
               </Badge>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
                <div className="flex justify-between border-b pb-1">
                  <span className="text-muted-foreground">SDG Alignment:</span>
-                 <span className="font-medium">{activity.evaluation.sdgAlignment}/5</span>
+                 <span className="font-medium">{displayEvaluation.sdgAlignment}/5</span>
                </div>
                <div className="flex justify-between border-b pb-1">
                  <span className="text-muted-foreground">Participation:</span>
-                 <span className="font-medium">{activity.evaluation.participationContribution}/5</span>
+                 <span className="font-medium">{displayEvaluation.participationContribution}/5</span>
                </div>
                <div className="flex justify-between border-b pb-1">
                  <span className="text-muted-foreground">Significance:</span>
-                 <span className="font-medium">{activity.evaluation.activitySignificanceImpact}/5</span>
+                 <span className="font-medium">{displayEvaluation.activitySignificanceImpact}/5</span>
                </div>
                <div className="flex justify-between border-b pb-1">
                  <span className="text-muted-foreground">Documentation:</span>
-                 <span className="font-medium">{activity.evaluation.proofDocumentation}/5</span>
+                 <span className="font-medium">{displayEvaluation.proofDocumentation}/5</span>
                </div>
                <div className="flex justify-between border-b pb-1">
                  <span className="text-muted-foreground">Description:</span>
-                 <span className="font-medium">{activity.evaluation.activityDescription}/5</span>
+                 <span className="font-medium">{displayEvaluation.activityDescription}/5</span>
                </div>
             </div>
-            {activity.evaluation.staffFeedback && (
+            {displayEvaluation.staffFeedback && (
               <div className="mt-2 text-sm italic text-muted-foreground border-l-2 border-primary/20 pl-3 py-1">
-                "{activity.evaluation.staffFeedback}"
+                "{displayEvaluation.staffFeedback}"
               </div>
             )}
           </div>
@@ -438,10 +451,10 @@ export function SubmissionCard({ activity, onUpdate }: { activity: Activity; onU
       {activity.status !== 'pending' && (
         <CardFooter className="flex justify-end items-center border-t pt-2 mt-2 bg-muted/20">
             <span className="text-[10px] text-muted-foreground italic mr-auto">
-              {activity.status === 'verified' ? 'Approved' : 'Rejected'} by {activity.verifiedBy === user?.uid ? 'You' : 'Staff'}
+              {isVerified ? 'Approved' : 'Rejected'} by {activity.verifiedBy === user?.uid ? 'You' : 'Staff'}
             </span>
-            <Badge variant={activity.status === 'verified' ? 'default' : 'destructive'} className="capitalize h-5 text-[10px] px-2">
-                {activity.status}
+            <Badge variant={isVerified ? 'default' : 'destructive'} className="capitalize h-5 text-[10px] px-2">
+                {isVerified ? 'Approved' : activity.status}
             </Badge>
         </CardFooter>
       )}
