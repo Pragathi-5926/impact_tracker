@@ -17,7 +17,7 @@ import { SDG_GOALS } from '@/lib/data';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { UploadCloud } from 'lucide-react';
+import { UploadCloud, Plus, Trash2, Link as LinkIcon } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { useRouter } from 'next/navigation';
@@ -28,8 +28,17 @@ export function ActivityForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fileName, setFileName] = useState('');
+  const [links, setLinks] = useState<string[]>(['']);
 
   if (!user) return null;
+
+  const addLink = () => setLinks([...links, '']);
+  const removeLink = (index: number) => setLinks(links.filter((_, i) => i !== index));
+  const updateLink = (index: number, value: string) => {
+    const newLinks = [...links];
+    newLinks[index] = value;
+    setLinks(newLinks);
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -38,6 +47,7 @@ export function ActivityForm() {
     const formData = new FormData(e.currentTarget);
     const description = formData.get('description') as string;
     const sdgGoals = formData.getAll('sdgGoals').map(Number);
+    const validLinks = links.filter(link => link.trim() !== '');
     
     if (!description || description.length < 10) {
       toast({
@@ -65,7 +75,7 @@ export function ActivityForm() {
         studentName: user.displayName || 'Student',
         description,
         sdgGoals,
-        documentationLinks: [], 
+        documentationLinks: validLinks, 
         status: 'pending',
         submittedAt: serverTimestamp(),
         points: 0,
@@ -76,9 +86,6 @@ export function ActivityForm() {
         description: 'Your activity has been submitted for review.',
       });
       
-      // Reset form
-      e.currentTarget.reset();
-      setFileName('');
       router.push('/dashboard/student');
     } catch (error: any) {
       toast({
@@ -101,7 +108,7 @@ export function ActivityForm() {
             by faculty.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="description">Activity Description</Label>
             <Textarea
@@ -109,44 +116,89 @@ export function ActivityForm() {
               name="description"
               placeholder="e.g., Organized a campus clean-up drive"
               required
+              className="min-h-[120px]"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Documentation File</Label>
-            <Label 
-              htmlFor="documentationFile"
-              className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-primary bg-primary/10 text-primary transition-colors hover:bg-primary/20"
-            >
-              <UploadCloud className="h-8 w-8" />
-              <span className="mt-2 text-sm font-semibold">
-                {fileName ? fileName : 'Click to upload or drag and drop'}
-              </span>
-              <p className="text-xs text-primary/80">PDF, PNG, JPG or other supporting documents</p>
-            </Label>
-            <Input
-              id="documentationFile"
-              name="documentationFile"
-              type="file"
-              className="sr-only"
-              onChange={(e) => setFileName(e.target.files?.[0]?.name || '')}
-            />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Documentation Links (e.g., GitHub, Portfolio, Articles)</Label>
+              <div className="space-y-2">
+                {links.map((link, index) => (
+                  <div key={index} className="flex gap-2">
+                    <div className="relative flex-1">
+                      <LinkIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        value={link}
+                        onChange={(e) => updateLink(index, e.target.value)}
+                        placeholder="https://github.com/username/project"
+                        type="url"
+                        className="pl-9"
+                      />
+                    </div>
+                    {links.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeLink(index)}
+                        className="shrink-0"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Remove link</span>
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={addLink}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Another Link
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Supporting Files (Optional)</Label>
+              <Label 
+                htmlFor="documentationFile"
+                className="flex h-24 w-full cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-primary bg-primary/5 text-primary transition-colors hover:bg-primary/10"
+              >
+                <UploadCloud className="h-6 w-6" />
+                <span className="mt-2 text-xs font-semibold">
+                  {fileName ? fileName : 'Click to upload or drag and drop'}
+                </span>
+                <p className="text-[10px] text-primary/80">PDF, PNG, JPG or other supporting documents</p>
+              </Label>
+              <Input
+                id="documentationFile"
+                name="documentationFile"
+                type="file"
+                className="sr-only"
+                onChange={(e) => setFileName(e.target.files?.[0]?.name || '')}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label>Relevant SDG Goals</Label>
-            <ScrollArea className="h-40 w-full rounded-md border p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <ScrollArea className="h-48 w-full rounded-md border p-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {SDG_GOALS.map((goal) => (
-                  <div key={goal.id} className="flex items-center space-x-2">
+                  <div key={goal.id} className="flex items-start space-x-2">
                     <Checkbox
                       id={`sdg-${goal.id}`}
                       name="sdgGoals"
                       value={goal.id.toString()}
+                      className="mt-1"
                     />
                     <label
                       htmlFor={`sdg-${goal.id}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      className="text-sm font-medium leading-tight cursor-pointer"
                     >
                       {goal.id}. {goal.name}
                     </label>
