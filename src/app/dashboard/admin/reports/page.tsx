@@ -3,11 +3,11 @@ import { SDGBarChart } from "@/components/dashboard/chart-components";
 import { DUMMY_ACTIVITIES, DUMMY_USERS } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { Users, CheckCircle, BarChart } from "lucide-react";
+import { Users, BarChart, ShieldCheck } from "lucide-react";
 
 export default function AdminReportsPage() {
     const totalStudents = DUMMY_USERS.filter(u => u.role === 'student').length;
-    const totalActivities = DUMMY_ACTIVITIES.filter(a => a.status === 'approved').length;
+    const totalStaff = DUMMY_USERS.filter(u => u.role === 'staff').length;
 
     const departmentData = DUMMY_USERS.reduce((acc, user) => {
         if(user.role === 'student' && user.department) {
@@ -42,7 +42,7 @@ export default function AdminReportsPage() {
 
              <div className="grid gap-4 md:grid-cols-3">
                 <StatCard title="Total Students" value={totalStudents} icon={Users} />
-                <StatCard title="Total Verified Activities" value={totalActivities} icon={CheckCircle} />
+                <StatCard title="Staff & HoD" value={totalStaff} icon={ShieldCheck} />
                 <StatCard title="Departments" value={Object.keys(departmentData).length} icon={BarChart} />
              </div>
 
