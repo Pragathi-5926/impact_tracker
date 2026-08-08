@@ -76,12 +76,12 @@ export function AuthForm() {
         {isSignUp && (
             <div className="grid gap-2">
                 <Label htmlFor="name" className="text-base">Full Name</Label>
-                <Input id="name" placeholder="John Doe" required />
+                <Input id="name" required />
             </div>
         )}
         <div className="grid gap-2">
           <Label htmlFor="email" className="text-base">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required defaultValue={isSignUp ? '' : 'demo@example.com'} />
+          <Input id="email" type="email" required defaultValue={isSignUp ? '' : 'demo@example.com'} />
         </div>
         <div className="grid gap-2">
           <div className="flex items-center">
