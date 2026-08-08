@@ -66,6 +66,14 @@ export function AuthForm() {
     router.push('/dashboard');
   };
 
+  const handleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+    toast({
+      title: 'Password Reset',
+      description: 'A password reset link has been sent to your email address.',
+    });
+  };
+
   const uniqueRoles = [...new Set(DUMMY_USERS.map(user => user.role))];
 
   if (loading) return null;
@@ -86,7 +94,7 @@ export function AuthForm() {
         <div className="grid gap-2">
           <div className="flex items-center">
             <Label htmlFor="password" className="text-base">Password</Label>
-            {isSignUp && (
+            {isSignUp ? (
               <a
                 href="#"
                 onClick={(e) => {
@@ -96,6 +104,14 @@ export function AuthForm() {
                 className="ml-auto inline-block text-sm underline text-primary"
               >
                 Already have an account?
+              </a>
+            ) : (
+              <a
+                href="#"
+                onClick={handleForgotPassword}
+                className="ml-auto inline-block text-sm underline text-primary"
+              >
+                Forgot your password?
               </a>
             )}
           </div>
