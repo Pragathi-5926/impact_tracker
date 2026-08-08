@@ -1,10 +1,7 @@
-
 'use client';
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
-import { useEffect, useState } from 'react';
+
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { addActivity } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -21,48 +18,81 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { UploadCloud } from 'lucide-react';
-
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" disabled={pending} className="w-full">
-      {pending ? 'Submitting...' : 'Submit Activity'}
-    </Button>
-  );
-}
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase/config';
+import { useRouter } from 'next/navigation';
 
 export function ActivityForm() {
   const { user } = useAuth();
-  const initialState = { message: null, errors: {} };
-  
-  // Hooks must be called unconditionally at the top level.
-  const addActivityWithStudentId = addActivity.bind(null, user?.uid || '', user?.displayName || 'Student');
-  const [state, dispatch] = useActionState(addActivityWithStudentId, initialState);
   const { toast } = useToast();
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [fileName, setFileName] = useState('');
 
+  if (!user) return null;
 
-  useEffect(() => {
-    if (state.type === 'success') {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const formData = new FormData(e.currentTarget);
+    const description = formData.get('description') as string;
+    const sdgGoals = formData.getAll('sdgGoals').map(Number);
+    
+    if (!description || description.length < 10) {
+      toast({
+        variant: 'destructive',
+        title: 'Validation Error',
+        description: 'Description must be at least 10 characters.',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (sdgGoals.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'Validation Error',
+        description: 'Please select at least one SDG goal.',
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, 'activities'), {
+        studentId: user.uid,
+        studentName: user.displayName || 'Student',
+        description,
+        sdgGoals,
+        documentationLinks: [], 
+        status: 'pending',
+        submittedAt: serverTimestamp(),
+        points: 0,
+      });
+
       toast({
         title: 'Success!',
-        description: state.message,
+        description: 'Your activity has been submitted for review.',
       });
-      setFileName(''); // Clear file name on successful submission
-    } else if (state.type === 'error') {
+      
+      // Reset form
+      e.currentTarget.reset();
+      setFileName('');
+      router.push('/dashboard/student');
+    } catch (error: any) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: state.message,
+        description: error.message || 'Failed to submit activity.',
       });
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [state, toast]);
-  
-  // This check must come after all hooks are called.
-  if (!user) return null;
+  }
 
   return (
-    <form action={dispatch}>
+    <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader>
           <CardTitle>Submit New Activity</CardTitle>
@@ -80,7 +110,6 @@ export function ActivityForm() {
               placeholder="e.g., Organized a campus clean-up drive"
               required
             />
-             {state.errors?.description && <p className="text-sm font-medium text-destructive">{state.errors.description[0]}</p>}
           </div>
 
           <div className="space-y-2">
@@ -102,9 +131,7 @@ export function ActivityForm() {
               className="sr-only"
               onChange={(e) => setFileName(e.target.files?.[0]?.name || '')}
             />
-            {state.errors?.documentationFile && <p className="text-sm font-medium text-destructive">{state.errors.documentationFile[0]}</p>}
           </div>
-
 
           <div className="space-y-2">
             <Label>Relevant SDG Goals</Label>
@@ -127,12 +154,12 @@ export function ActivityForm() {
                 ))}
               </div>
             </ScrollArea>
-             {state.errors?.sdgGoals && <p className="text-sm font-medium text-destructive">{state.errors.sdgGoals[0]}</p>}
           </div>
-          <SubmitButton />
+          <Button type="submit" disabled={isSubmitting} className="w-full">
+            {isSubmitting ? 'Submitting...' : 'Submit Activity'}
+          </Button>
         </CardContent>
       </Card>
     </form>
   );
 }
-
