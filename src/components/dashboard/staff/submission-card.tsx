@@ -47,11 +47,12 @@ import {
 } from 'lucide-react';
 import { SDG_GOALS } from '@/lib/data';
 import { useToast } from '@/hooks/use-toast';
-import { approveAndEvaluateActivity, rejectActivityWithReason } from '@/app/actions';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Separator } from '@/components/ui/separator';
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase/config';
 
-export function SubmissionCard({ activity }: { activity: Activity }) {
+export function SubmissionCard({ activity, onUpdate }: { activity: Activity; onUpdate?: (updatedActivity: Activity) => void }) {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isApproveOpen, setIsApproveOpen] = useState(false);
@@ -87,21 +88,51 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
     }
 
     setIsSubmitting(true);
-    const evaluationData = {
-      ...Object.fromEntries(Object.entries(scores).map(([k, v]) => [k, Number(v)])),
+    
+    const evaluation = {
+      sdgAlignment: Number(scores.sdgAlignment),
+      participationContribution: Number(scores.participationContribution),
+      activitySignificanceImpact: Number(scores.activitySignificanceImpact),
+      proofDocumentation: Number(scores.proofDocumentation),
+      activityDescription: Number(scores.activityDescription),
       totalScore,
       staffFeedback,
       evaluatedBy: user.uid,
+      evaluatedAt: new Date(),
     };
 
-    const result = await approveAndEvaluateActivity(activity.id, user.uid, evaluationData);
-    if (result.type === 'success') {
-      toast({ title: 'Success', description: result.message });
-      setIsApproveOpen(false);
-    } else {
-      toast({ variant: 'destructive', title: 'Error', description: result.message });
+    try {
+      if (activity.id.startsWith('act-')) {
+        // Handle dummy activity
+        const updatedActivity: Activity = {
+          ...activity,
+          status: 'verified',
+          points: totalScore,
+          evaluation,
+          verifiedBy: user.uid,
+          verifiedAt: new Date(),
+        };
+        onUpdate?.(updatedActivity);
+        toast({ title: 'Success', description: 'Activity approved and evaluated successfully.' });
+        setIsApproveOpen(false);
+      } else {
+        // Handle real Firestore activity
+        const activityRef = doc(db, 'activities', activity.id);
+        await updateDoc(activityRef, {
+          status: 'verified',
+          points: totalScore,
+          evaluation,
+          verifiedBy: user.uid,
+          verifiedAt: serverTimestamp(),
+        });
+        toast({ title: 'Success', description: 'Activity approved and evaluated successfully.' });
+        setIsApproveOpen(false);
+      }
+    } catch (e: any) {
+      toast({ variant: 'destructive', title: 'Error', description: e.message || 'Failed to evaluate submission.' });
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   const handleReject = async () => {
@@ -117,19 +148,45 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
     }
 
     setIsSubmitting(true);
-    const rejectionData = {
+    
+    const rejection = {
       reason: rejectionReason,
       rejectedBy: user.uid,
+      rejectedAt: new Date(),
     };
 
-    const result = await rejectActivityWithReason(activity.id, user.uid, rejectionData);
-    if (result.type === 'success') {
-      toast({ title: 'Success', description: result.message });
-      setIsRejectOpen(false);
-    } else {
-      toast({ variant: 'destructive', title: 'Error', description: result.message });
+    try {
+      if (activity.id.startsWith('act-')) {
+        // Handle dummy activity
+        const updatedActivity: Activity = {
+          ...activity,
+          status: 'rejected',
+          rejection,
+          verifiedBy: user.uid,
+          verifiedAt: new Date(),
+          points: 0,
+        };
+        onUpdate?.(updatedActivity);
+        toast({ title: 'Success', description: 'Activity rejected successfully.' });
+        setIsRejectOpen(false);
+      } else {
+        // Handle real Firestore activity
+        const activityRef = doc(db, 'activities', activity.id);
+        await updateDoc(activityRef, {
+          status: 'rejected',
+          rejection,
+          verifiedBy: user.uid,
+          verifiedAt: serverTimestamp(),
+          points: 0,
+        });
+        toast({ title: 'Success', description: 'Activity rejected successfully.' });
+        setIsRejectOpen(false);
+      }
+    } catch (e: any) {
+      toast({ variant: 'destructive', title: 'Error', description: e.message || 'Failed to reject submission.' });
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
   const getInitials = (name: string) => {
@@ -150,7 +207,7 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
 
   const submittedDate = activity.submittedAt instanceof Date 
     ? activity.submittedAt 
-    : activity.submittedAt ? new Date(activity.submittedAt.seconds * 1000) : new Date();
+    : (activity.submittedAt as any)?.seconds ? new Date((activity.submittedAt as any).seconds * 1000) : new Date();
 
   return (
     <Card>
@@ -265,7 +322,7 @@ export function SubmissionCard({ activity }: { activity: Activity }) {
               <span className="font-semibold text-foreground">Reason:</span> {activity.rejection.reason}
             </p>
             <p className="text-xs text-muted-foreground mt-2">
-              Rejected on {format(activity.rejection.rejectedAt instanceof Date ? activity.rejection.rejectedAt : new Date(activity.rejection.rejectedAt.seconds * 1000), 'PPP')}
+              Rejected on {format(activity.rejection.rejectedAt instanceof Date ? activity.rejection.rejectedAt : new Date((activity.rejection.rejectedAt as any).seconds * 1000), 'PPP')}
             </p>
           </div>
         )}
